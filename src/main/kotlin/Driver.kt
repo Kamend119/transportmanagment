@@ -8,12 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: Int) {
+fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: String) {
 
     var activeTrips by remember { mutableStateOf(listOf<List<String>>()) }
 
     LaunchedEffect(Unit) {
-        activeTrips = getActiveTripsByDriver(driverID.toBigInteger(), "driver_user", "driver1")
+        activeTrips = getActiveTripsByDriver(driverID, "driver_user", "driver1")
     }
 
     MainScaffold(

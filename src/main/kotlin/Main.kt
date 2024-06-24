@@ -19,11 +19,14 @@ import kotlinx.coroutines.launch
 @Preview
 fun App() {
     var currentPage by remember { mutableStateOf(Pages.LoginPage) }
-    var currentEmployeeId by remember { mutableStateOf(-1) }
+    var currentEmployeeId by remember { mutableStateOf("") }
 
     MaterialTheme {
         when (currentPage) {
-            Pages.LoginPage -> LoginPage { currentPage = it }
+            Pages.LoginPage -> LoginPage { userId, page ->
+                currentPage = page
+                currentEmployeeId = userId
+            }
             Pages.AdministratorMainPage -> AdministratorMainPage { currentPage = it }
             Pages.DriverMainPage -> DriverMainPage({ currentPage = it }, currentEmployeeId)
             Pages.ManagerMainPage -> ManagerMainPage { currentPage = it }
@@ -73,7 +76,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
     ModalDrawer(
         drawerState = drawerState,
         drawerContent = {
-            when (title){
+            when (title) {
                 "Администратор" -> AdministratorDrawerContent(onLogout)
                 "Менеджер" -> ManagerDrawerContent(onLogout)
             }
@@ -109,30 +112,32 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
 }
 
 @Composable
-fun LoginPage(onLoginSuccess: (Pages) -> Unit) {
+fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var selectUser by remember { mutableStateOf(false) }
-    var userData by remember { mutableStateOf(mutableListOf<String>()) }
+    var userData by remember { mutableStateOf(listOf<String>()) }
     var userNotFound by remember { mutableStateOf(false) }
 
     if (selectUser) {
         LaunchedEffect(Unit) {
-            userData = authorization(login, password, "postgres", "OpHypLoic")
+            val result = authorization(login, password, "postgres", "OpHypLoic")
 
-            if (userData == null) {
-                userNotFound = true
-            } else {
-                val page = when (userData!!.second) {
+            if (result != null) {
+                userData = result
+                val page = when (result[1]) {
                     "Администратор" -> Pages.AdministratorMainPage
                     "Водитель" -> Pages.DriverMainPage
                     "Менеджер" -> Pages.ManagerMainPage
                     else -> null
                 }
                 if (page != null) {
-                    onLoginSuccess(List(page, userData.first))
+                    onLoginSuccess(result[0], page)
                 }
+            }
+            else{
+                userNotFound = true
             }
             selectUser = false
         }

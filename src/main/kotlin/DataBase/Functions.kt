@@ -14,7 +14,7 @@ fun authorization(login: String, password: String, user : String, pass : String)
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM authorization('$login', '$password')")
             if (resultSet.next()) {
-                val employeeId = resultSet.getInt("employee_id").toString()
+                val employeeId = resultSet.getInt("id").toString()
                 val jobName = resultSet.getString("job_name")
                 result = listOf(employeeId, jobName)
                 return result
@@ -27,7 +27,7 @@ fun authorization(login: String, password: String, user : String, pass : String)
 }
 
 
-fun getActiveTripsByDriver(driver_id : BigInteger, user : String, pass : String): List<List<String>> {
+fun getActiveTripsByDriver(driver_id : String, user : String, pass : String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection(user, pass).use { connection ->
