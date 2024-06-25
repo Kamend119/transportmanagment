@@ -1,4 +1,3 @@
-import java.math.BigInteger
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
@@ -46,3 +45,26 @@ fun getActiveTrip(driverId: String): List<List<String>> {
     return result
 }
 
+fun generateCargoDeclaration(contractId: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            println()
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM generate_cargo_declaration($contractId)")
+            println(resultSet)
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("cargo_name"),
+                    resultSet.getString("cargo_volume"),
+                    resultSet.getBigDecimal("cargo_weight").toString(),
+                    resultSet.getString("cargo_description")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}

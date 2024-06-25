@@ -2,5 +2,10 @@ enum class Pages {
     LoginPage,
     DriverMainPage,
     ManagerMainPage,
-    AdministratorMainPage
+    AdministratorMainPage,
+
+    FillInfoTripDriver,
+    CargosWithTripDriver,
+    DepartPointsDriver,
+    Declaration
 }

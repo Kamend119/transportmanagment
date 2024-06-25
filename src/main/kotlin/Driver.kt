@@ -1,3 +1,4 @@
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,8 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: String) {
-    var activeTrips by remember { mutableStateOf(listOf<List<String>>()) }
+fun DriverMainPage(onLoginSuccess: (userData: String, page: Pages) -> Unit, onLogout: (Pages) -> Unit, driverID: String) {
+    var activeTrips by remember { mutableStateOf(listOf(listOf(""))) }
     var dialogWindow by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
 
@@ -27,18 +28,34 @@ fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: String) {
             onDismissRequest = { dialogWindow = false },
             title = { Text(text = "Рейс №$currentId.") },
             text = { Text("Выберите действие") },
-            confirmButton = {
-                Button(onClick = { dialogWindow = false }) {
-                    Text("Просмотреть полную информацию о рейсе", fontSize = 22.sp)
-                }
-                Button(onClick = { dialogWindow = false }) {
-                    Text("Просмотреть грузы в рейсе", fontSize = 22.sp)
-                }
-                Button(onClick = { dialogWindow = false }) {
-                    Text("Просмотреть точки назначения", fontSize = 22.sp)
-                }
-                Button(onClick = { dialogWindow = false }) {
-                    Text("Создать декларацию на грузы", fontSize = 22.sp)
+            buttons = {
+                Column(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.FillInfoTripDriver)
+                    }) {
+                        Text("Просмотреть полную информацию", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.CargosWithTripDriver)
+                    }) {
+                        Text("Просмотреть грузы", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.DepartPointsDriver)
+                    }) {
+                        Text("Просмотреть точки назначения", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.Declaration)
+                    }) {
+                        Text("Создать декларацию на грузы", fontSize = 15.sp)
+                    }
                 }
             }
         )
@@ -69,15 +86,108 @@ fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: String) {
                         val trip = activeTrips[index]
                         Row(
                             Modifier
+                                .fillMaxWidth()
                                 .clickable {
-                                dialogWindow = true
-                                currentId = index.toString()
-                            }
+                                    dialogWindow = true
+                                    currentId = trip[0]
+                                }
                         ) {
-                            TableContent(trip)
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun FillInfoTripDriver(onLogout: (Pages) -> Unit = {}) {
+    MainScaffold(
+        title = "Водитель",
+        onLogout = onLogout
+    ){
+
+    }
+}
+
+@Composable
+fun CargosWithTripDriver(onLogout: (Pages) -> Unit = {}) {
+    MainScaffold(
+        title = "Водитель",
+        onLogout = onLogout
+    ){
+
+    }
+}
+
+@Composable
+fun DepartPointsDriver(onLogout: (Pages) -> Unit = {}) {
+    MainScaffold(
+        title = "Водитель",
+        onLogout = onLogout
+    ){
+
+    }
+}
+
+@Composable
+fun Declaration(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        declaration = generateCargoDeclaration(contractID)
+    }
+
+    MainScaffold(
+        title = "Водитель",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TableHeader(headers = listOf("Наименование", "Объем", "Вес", "Описание"))
+                LazyColumn {
+                    items(declaration.size) { index ->
+                        val trip = declaration[index]
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                        ) {
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Button(
+                onClick = { saveToCsv(declaration, contractID) },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Сохранить в CSV")
             }
         }
     }

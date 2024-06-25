@@ -8,27 +8,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import java.io.File
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 
 @Composable
 @Preview
 fun App() {
     var currentPage by remember { mutableStateOf(Pages.LoginPage) }
-    var currentEmployeeId by remember { mutableStateOf("") }
+    var currentId by remember { mutableStateOf("") }
 
     MaterialTheme {
         when (currentPage) {
             Pages.LoginPage -> LoginPage { userId, page ->
                 currentPage = page
-                currentEmployeeId = userId
+                currentId = userId
             }
+
             Pages.AdministratorMainPage -> AdministratorMainPage { currentPage = it }
-            Pages.DriverMainPage -> DriverMainPage({ currentPage = it }, currentEmployeeId)
+
+            Pages.DriverMainPage -> DriverMainPage({ userId, page ->
+                currentPage = page
+                currentId = userId }, { currentPage = it }, currentId)
+
             Pages.ManagerMainPage -> ManagerMainPage { currentPage = it }
+
+            Pages.FillInfoTripDriver -> FillInfoTripDriver { currentPage = it }
+
+            Pages.CargosWithTripDriver -> CargosWithTripDriver { currentPage = it }
+
+            Pages.DepartPointsDriver -> DepartPointsDriver { currentPage = it }
+
+            Pages.Declaration -> Declaration ({ currentPage = it }, currentId)
         }
     }
 }
@@ -44,7 +63,7 @@ fun main() = application {
 
 @Composable
 fun TableHeader(headers: List<String>) {
-    Row {
+    Row(Modifier.fillMaxWidth()) {
         headers.forEach { header ->
             TableCell(text = header, isHeader = true)
         }
@@ -53,42 +72,21 @@ fun TableHeader(headers: List<String>) {
 
 @Composable
 fun TableCell(text: String, isHeader: Boolean = false) {
-    val backgroundColor = if (isHeader) MaterialTheme.colors.primary else MaterialTheme.colors.surface
-    val textColor = if (isHeader) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
-
-    Box(
-        modifier = Modifier
-            .border(1.dp, MaterialTheme.colors.onSurface)
-            .background(backgroundColor)
-            .padding(8.dp)
-    ) {
-        Text(
-            text = text,
-            color = textColor
-        )
-    }
-}
-
-@Composable
-fun TableRow(rowData: String) {
-    Row {
-        TableCell(text = rowData)
-    }
-}
-
-@Composable
-fun TableContent(data: List<String>) {
-    Row {
-        data.forEach { row ->
-            TableRow(rowData = row)
-        }
-    }
+    Text(
+        text = text,
+        Modifier
+            .width(150.dp)
+            .padding(8.dp),
+        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var expanded by remember { mutableStateOf(false) }
 
     ModalDrawer(
         drawerState = drawerState,
@@ -100,7 +98,6 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                     "Администратор" -> AdministratorDrawerContent(onLogout)
                     "Менеджер" -> ManagerDrawerContent(onLogout)
                 }
-                Text("sbfhdnviufdn")
             }
         },
         content = {
@@ -120,8 +117,27 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                             }
                         },
                         actions = {
-                            IconButton(onClick = { onLogout(Pages.LoginPage) }) {
-                                Icon(Icons.Filled.Home, contentDescription = "Выйти")
+                            IconButton(onClick = {
+                                when (title) {
+                                    "Водитель" -> onLogout(Pages.DriverMainPage)
+                                    "Администратор" -> onLogout(Pages.AdministratorMainPage)
+                                    "Менеджер" -> onLogout(Pages.ManagerMainPage)
+                                }
+                            }) {
+                                Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                            }
+
+                            Box {
+                                IconButton(onClick = { expanded = true }) {
+                                    Icon(Icons.Default.AccountCircle, contentDescription = "Показать меню")
+                                }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    //Divider()
+                                    Text("Выйти", fontSize=10.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
+                                }
                             }
                         }
                     )
@@ -208,4 +224,21 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
             Text("Войти")
         }
     }
+}
+
+
+fun saveToCsv(data: List<List<String>>, contractID: String) {
+    val outputFile = File("declaration_$contractID.csv")
+
+    outputFile.printWriter().use { out ->
+        // Write header
+        out.println("Наименование,Объем,Вес,Описание")
+
+        // Write data
+        data.forEach { row ->
+            out.println(row.joinToString(","))
+        }
+    }
+
+    println("CSV file saved successfully.")
 }
