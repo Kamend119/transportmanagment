@@ -1,7 +1,6 @@
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -166,7 +165,7 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
 
     LaunchedEffect(Unit) {
-        declaration = generateCargoDeclaration(contractID)
+        declaration = viewCargosInContract(contractID)
     }
 
     MainScaffold(
@@ -187,7 +186,7 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TableHeader(headers = listOf("ID", "Наименование", "Объем", "Вес", "Класс"))
+                TableHeader(headers = listOf("ID", "Наименование", "Вес", "Объем", "Класс"))
                 LazyColumn {
                     items(declaration.size) { index ->
                         val trip = declaration[index]
@@ -206,23 +205,65 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     }
 }
 
-
 @Composable
 fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        declaration = getContractDestinationPoints(contractID)
+    }
+
     MainScaffold(
         title = "Водитель",
         onLogout = onLogout
     ) {
-
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TableHeader(headers = listOf("ID", "Тип", "Город", "Адрес", "Дата", "Статус"))
+                LazyColumn {
+                    items(declaration.size) { index ->
+                        val trip = declaration[index]
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                        ) {
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun Declaration(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         declaration = generateCargoDeclaration(contractID)
+    }
+
+    if (showDialog) {
+        val filePath = SelectFileDialog {
+            showDialog = false
+        }
+        println(filePath)
     }
 
     MainScaffold(
@@ -268,7 +309,10 @@ fun Declaration(onLogout: (Pages) -> Unit, contractID: String) {
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Button(
-                onClick = { saveToCsv(declaration, contractID) },
+                onClick = {
+                    showDialog = true
+//                    saveToCsv(declaration, contractID)
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Сохранить в CSV")

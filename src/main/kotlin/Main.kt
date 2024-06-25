@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.rememberDialogState
+import java.awt.FileDialog
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -253,4 +256,37 @@ fun saveToCsv(data: List<List<String>>, contractID: String) {
     }
 
     println("CSV file saved successfully.")
+}
+
+
+@Composable
+fun SelectFileDialog(
+    onDialogDismiss: () -> Unit
+): String {
+    val dialogState = rememberDialogState()
+    val coroutineScope = rememberCoroutineScope()
+    var filePath by remember { mutableStateOf("") }
+
+    Dialog(
+        state = dialogState,
+        title = "Select File or Folder",
+        onCloseRequest = onDialogDismiss
+    ) {
+        val fileDialog = remember { FileDialog(null as java.awt.Frame?, "Select File or Folder", FileDialog.LOAD) }
+
+        coroutineScope.launch {
+            fileDialog.isVisible = true
+            fileDialog.toFront()
+            fileDialog.requestFocus()
+
+            fileDialog.isVisible = false
+
+            val chosenFile = File(fileDialog.directory, fileDialog.file)
+            filePath = chosenFile.absolutePath
+        }
+    }
+    if (filePath != "") {
+        return filePath
+    }
+    return ""
 }
