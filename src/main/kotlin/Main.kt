@@ -83,23 +83,14 @@ fun TableCell(text: String, isHeader: Boolean = false) {
 }
 
 @Composable
-fun RowHeader(headers: List<String>) {
-    Column(Modifier.fillMaxWidth()) {
-        headers.forEach { header ->
-            TableCell(text = header, isHeader = true)
-        }
-    }
-}
-
-@Composable
 fun RowCell(text: String, isHeader: Boolean = false) {
     Text(
         text = text,
         Modifier
-            .width(150.dp)
+            .height(150.dp)
             .padding(8.dp),
         style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Start
     )
 }
 

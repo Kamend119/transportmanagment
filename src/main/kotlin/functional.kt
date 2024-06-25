@@ -56,8 +56,8 @@ fun generateCargoDeclaration(contractId: String): List<List<String>> {
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("cargo_name"),
-                    resultSet.getString("cargo_volume"),
-                    resultSet.getBigDecimal("cargo_weight").toString(),
+                    resultSet.getFloat("cargo_volume").toString(),
+                    resultSet.getFloat("cargo_weight").toString(),
                     resultSet.getString("cargo_description")
                 )
                 result.add(row)
@@ -103,3 +103,27 @@ fun getContractInfo(contractId: String): List<List<String>> {
     return result
 }
 
+fun viewCargosInContract(contractId: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            println()
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM view_cargos_in_contract($contractId)")
+            println(resultSet)
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("cargo_id").toString(),
+                    resultSet.getString("cargo_name"),
+                    resultSet.getFloat("cargo_volume").toString(),
+                    resultSet.getFloat("cargo_weight").toString(),
+                    resultSet.getString("cargo_class")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}

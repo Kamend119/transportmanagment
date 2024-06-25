@@ -127,39 +127,33 @@ fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Text("Договор №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            Column(
+
+            val headers = listOf(
+                "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
+                "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
+                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
+                "Адрес", "Дата", "Дополнительные услуги"
+            )
+
+            val contractInfo = declaration.getOrNull(0) ?: listOf()
+
+            LazyColumn(
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LazyRow(
-                    Modifier
-                        .fillMaxWidth()
-                ) {
-                    item {
-                        TableHeader(
-                            headers = listOf(
-                                "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
-                                "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
-                                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
-                                "Адрес", "Дата", "дополнительные услуги"
-                            )
-                        )
-                    }
-
-                }
-                LazyColumn {
-                    items(declaration.size) { index ->
-                        val trip = declaration[index]
-                        LazyRow(
-                            Modifier
-                                .fillMaxWidth()
-                        ) {
-                            items(trip.size){
-                                TableCell(text = trip[it])
-                            }
-                        }
+                items(headers.size) { index ->
+                    val header = headers[index]
+                    val value = contractInfo.getOrElse(index) { "N/A" }
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        TableCell(text = header, isHeader = true)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TableCell(text = value)
                     }
                 }
             }
@@ -169,13 +163,49 @@ fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
 
 @Composable
 fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        declaration = generateCargoDeclaration(contractID)
+    }
+
     MainScaffold(
         title = "Водитель",
         onLogout = onLogout
     ) {
-
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TableHeader(headers = listOf("ID", "Наименование", "Объем", "Вес", "Класс"))
+                LazyColumn {
+                    items(declaration.size) { index ->
+                        val trip = declaration[index]
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                        ) {
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
