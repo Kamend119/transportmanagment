@@ -78,7 +78,7 @@ fun TableRow(rowData: String) {
 
 @Composable
 fun TableContent(data: List<String>) {
-    Column {
+    Row {
         data.forEach { row ->
             TableRow(rowData = row)
         }

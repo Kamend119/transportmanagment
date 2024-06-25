@@ -63,12 +63,13 @@ fun DriverMainPage(onLogout: (Pages) -> Unit, driverID: String) {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TableHeader(headers = listOf("ID", "Дата и время отправления", "Адрес"))
+                TableHeader(headers = listOf("ID", "ФИО водителя", "ФИО клиента", "Дата оформления"))
                 LazyColumn {
                     items(activeTrips.size) { index ->
                         val trip = activeTrips[index]
                         Row(
-                            Modifier.clickable {
+                            Modifier
+                                .clickable {
                                 dialogWindow = true
                                 currentId = index.toString()
                             }
