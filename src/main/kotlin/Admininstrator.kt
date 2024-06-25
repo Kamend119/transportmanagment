@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -26,6 +27,12 @@ fun AdministratorDrawerContent(onLogout: (Pages) -> Unit){
                 .padding(10.dp)
                 .clickable { onLogout(Pages.DriverPerformance) }
                 .padding(15.dp))
+        Divider()
+        Text("Документы", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .padding(15.dp))
+        Divider()
     }
 }
 
@@ -72,7 +79,9 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
         ) {
             Row (
                 Modifier.fillMaxWidth()
-                    .height(100.dp)
+                    .height(100.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
             ){
                 OutlinedTextField(
                     start_date,
@@ -150,7 +159,9 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
         ) {
             Row (
                 Modifier.fillMaxWidth()
-                    .height(100.dp)
+                    .height(100.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
             ){
                 OutlinedTextField(
                     start_date,
