@@ -68,3 +68,38 @@ fun generateCargoDeclaration(contractId: String): List<List<String>> {
     }
     return result
 }
+
+fun getContractInfo(contractId: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            println()
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_info($contractId)")
+            println(resultSet)
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("contracts_id").toString(),
+                    resultSet.getDate("conclusion_date").toString(),
+                    resultSet.getFloat("cost").toString(),
+                    resultSet.getString("customer_fullname"),
+                    resultSet.getString("manager_fullname"),
+                    resultSet.getString("driver_fullname"),
+                    resultSet.getString("car_licenseplate"),
+                    resultSet.getString("car_model"),
+                    resultSet.getString("car_brand"),
+                    resultSet.getString("destinationpoint_type"),
+                    resultSet.getString("destinationpoint_city"),
+                    resultSet.getString("destinationpoint_address"),
+                    resultSet.getDate("destinationpoint_arrival_date").toString(),
+                    resultSet.getString("additional_services")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+

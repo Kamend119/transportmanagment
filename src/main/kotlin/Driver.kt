@@ -1,7 +1,7 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -14,7 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DriverMainPage(onLoginSuccess: (userData: String, page: Pages) -> Unit, onLogout: (Pages) -> Unit, driverID: String) {
+fun DriverMainPage(
+    onLoginSuccess: (userData: String, page: Pages) -> Unit,
+    onLogout: (Pages) -> Unit,
+    driverID: String
+) {
     var activeTrips by remember { mutableStateOf(listOf(listOf(""))) }
     var dialogWindow by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
@@ -104,31 +108,81 @@ fun DriverMainPage(onLoginSuccess: (userData: String, page: Pages) -> Unit, onLo
 }
 
 @Composable
-fun FillInfoTripDriver(onLogout: (Pages) -> Unit = {}) {
+fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        declaration = getContractInfo(contractID)
+    }
+
     MainScaffold(
         title = "Водитель",
         onLogout = onLogout
-    ){
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Договор №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LazyRow(
+                    Modifier
+                        .fillMaxWidth()
+                ) {
+                    item {
+                        TableHeader(
+                            headers = listOf(
+                                "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
+                                "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
+                                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
+                                "Адрес", "Дата", "дополнительные услуги"
+                            )
+                        )
+                    }
+
+                }
+                LazyColumn {
+                    items(declaration.size) { index ->
+                        val trip = declaration[index]
+                        LazyRow(
+                            Modifier
+                                .fillMaxWidth()
+                        ) {
+                            items(trip.size){
+                                TableCell(text = trip[it])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
+    MainScaffold(
+        title = "Водитель",
+        onLogout = onLogout
+    ) {
 
     }
 }
 
 @Composable
-fun CargosWithTripDriver(onLogout: (Pages) -> Unit = {}) {
+fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
     MainScaffold(
         title = "Водитель",
         onLogout = onLogout
-    ){
-
-    }
-}
-
-@Composable
-fun DepartPointsDriver(onLogout: (Pages) -> Unit = {}) {
-    MainScaffold(
-        title = "Водитель",
-        onLogout = onLogout
-    ){
+    ) {
 
     }
 }

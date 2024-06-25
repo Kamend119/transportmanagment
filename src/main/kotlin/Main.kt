@@ -41,13 +41,13 @@ fun App() {
 
             Pages.ManagerMainPage -> ManagerMainPage { currentPage = it }
 
-            Pages.FillInfoTripDriver -> FillInfoTripDriver { currentPage = it }
+            Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
 
-            Pages.CargosWithTripDriver -> CargosWithTripDriver { currentPage = it }
+            Pages.CargosWithTripDriver -> CargosWithTripDriver({ currentPage = it }, currentId)
 
-            Pages.DepartPointsDriver -> DepartPointsDriver { currentPage = it }
+            Pages.DepartPointsDriver -> DepartPointsDriver({ currentPage = it }, currentId)
 
-            Pages.Declaration -> Declaration ({ currentPage = it }, currentId)
+            Pages.Declaration -> Declaration({ currentPage = it }, currentId)
         }
     }
 }
@@ -72,6 +72,27 @@ fun TableHeader(headers: List<String>) {
 
 @Composable
 fun TableCell(text: String, isHeader: Boolean = false) {
+    Text(
+        text = text,
+        Modifier
+            .width(150.dp)
+            .padding(8.dp),
+        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun RowHeader(headers: List<String>) {
+    Column(Modifier.fillMaxWidth()) {
+        headers.forEach { header ->
+            TableCell(text = header, isHeader = true)
+        }
+    }
+}
+
+@Composable
+fun RowCell(text: String, isHeader: Boolean = false) {
     Text(
         text = text,
         Modifier
