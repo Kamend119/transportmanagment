@@ -8,7 +8,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import DataBase.authorization
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
@@ -57,28 +56,51 @@ fun TableCell(text: String, isHeader: Boolean = false) {
     val backgroundColor = if (isHeader) MaterialTheme.colors.primary else MaterialTheme.colors.surface
     val textColor = if (isHeader) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
 
-    Text(
-        text = text,
+    Box(
         modifier = Modifier
             .border(1.dp, MaterialTheme.colors.onSurface)
+            .background(backgroundColor)
             .padding(8.dp)
-            //.weight(1f)
-            .background(backgroundColor),
-        color = textColor
-    )
+    ) {
+        Text(
+            text = text,
+            color = textColor
+        )
+    }
+}
+
+@Composable
+fun TableRow(rowData: String) {
+    Row {
+        TableCell(text = rowData)
+    }
+}
+
+@Composable
+fun TableContent(data: List<String>) {
+    Column {
+        data.forEach { row ->
+            TableRow(rowData = row)
+        }
+    }
 }
 
 @Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
-    var drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalDrawer(
         drawerState = drawerState,
         drawerContent = {
-            when (title) {
-                "Администратор" -> AdministratorDrawerContent(onLogout)
-                "Менеджер" -> ManagerDrawerContent(onLogout)
+            Column(
+                modifier = Modifier.width(100.dp)
+            ){
+                when (title) {
+                    "Администратор" -> AdministratorDrawerContent(onLogout)
+                    "Менеджер" -> ManagerDrawerContent(onLogout)
+                }
+                Text("sbfhdnviufdn")
             }
         },
         content = {
@@ -122,7 +144,7 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
 
     if (selectUser) {
         LaunchedEffect(Unit) {
-            val result = authorization(login, password, "postgres", "OpHypLoic")
+            val result = authorization(login, password)
 
             if (result != null) {
                 userData = result

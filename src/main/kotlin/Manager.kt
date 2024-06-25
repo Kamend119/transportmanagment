@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 
 fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
-
+    // внутренность выдвижной панели
 }
 
 @Composable
