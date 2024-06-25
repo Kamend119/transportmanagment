@@ -4,8 +4,16 @@ enum class Pages {
     ManagerMainPage,
     AdministratorMainPage,
 
+    // водитэл
     FillInfoTripDriver,
     CargosWithTripDriver,
     DepartPointsDriver,
-    Declaration
+    Declaration,
+
+    // менеджэр
+    PreliminaryCost,
+
+    //адмэн
+    ContractsSummaryForManagers,
+    DriverPerformance
 }

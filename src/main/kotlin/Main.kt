@@ -37,20 +37,24 @@ fun App() {
             }
 
             Pages.AdministratorMainPage -> AdministratorMainPage { currentPage = it }
-
             Pages.DriverMainPage -> DriverMainPage({ userId, page ->
                 currentPage = page
                 currentId = userId }, { currentPage = it }, currentId)
-
             Pages.ManagerMainPage -> ManagerMainPage { currentPage = it }
 
+            // водитэл
             Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
-
             Pages.CargosWithTripDriver -> CargosWithTripDriver({ currentPage = it }, currentId)
-
             Pages.DepartPointsDriver -> DepartPointsDriver({ currentPage = it }, currentId)
-
             Pages.Declaration -> Declaration({ currentPage = it }, currentId)
+
+            //менеджэр
+            Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
+
+            //адмэн
+            Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
+            Pages.DriverPerformance -> DriverPerformance{ currentPage = it }
+
         }
     }
 }
@@ -86,18 +90,6 @@ fun TableCell(text: String, isHeader: Boolean = false) {
 }
 
 @Composable
-fun RowCell(text: String, isHeader: Boolean = false) {
-    Text(
-        text = text,
-        Modifier
-            .height(150.dp)
-            .padding(8.dp),
-        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
-        textAlign = TextAlign.Start
-    )
-}
-
-@Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -106,13 +98,9 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
     ModalDrawer(
         drawerState = drawerState,
         drawerContent = {
-            Column(
-                modifier = Modifier.width(100.dp)
-            ){
-                when (title) {
+            when (title) {
                     "Администратор" -> AdministratorDrawerContent(onLogout)
                     "Менеджер" -> ManagerDrawerContent(onLogout)
-                }
             }
         },
         content = {
@@ -151,7 +139,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                                     onDismissRequest = { expanded = false }
                                 ) {
                                     //Divider()
-                                    Text("Выйти", fontSize=10.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
+                                    Text("Выйти", fontSize=15.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
                                 }
                             }
                         }
@@ -241,7 +229,6 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     }
 }
 
-
 fun saveToCsv(data: List<List<String>>, contractID: String) {
     val outputFile = File("declaration_$contractID.csv")
 
@@ -257,7 +244,6 @@ fun saveToCsv(data: List<List<String>>, contractID: String) {
 
     println("CSV file saved successfully.")
 }
-
 
 @Composable
 fun SelectFileDialog(

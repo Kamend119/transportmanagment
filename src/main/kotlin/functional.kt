@@ -2,6 +2,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
+// водитэл
 fun authorization(login: String, password: String): List<String>? {
     var result: List<String>
     try {
@@ -25,10 +26,8 @@ fun getActiveTrip(driverId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println()
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_active_trip($driverId)")
-            println(resultSet)
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("contracts_number").toString(),
@@ -49,10 +48,8 @@ fun generateCargoDeclaration(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println()
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM generate_cargo_declaration($contractId)")
-            println(resultSet)
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("cargo_name"),
@@ -73,10 +70,8 @@ fun getContractInfo(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println()
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_info($contractId)")
-            println(resultSet)
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("contracts_id").toString(),
@@ -107,10 +102,8 @@ fun viewCargosInContract(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println()
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM view_cargos_in_contract($contractId)")
-            println(resultSet)
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("cargos_id").toString(),
@@ -132,10 +125,8 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println()
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_destination_points($contractId)")
-            println(resultSet)
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("destination_point_id").toString(),
@@ -144,6 +135,91 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
                     resultSet.getString("address"),
                     resultSet.getDate("arrivaldate").toString(),
                     resultSet.getString("status")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+
+// менеджэр
+fun viewActiveContractInfo(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM view_active_contract_info()")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("contract_number").toString(),
+                    resultSet.getString("manager_fullname"),
+                    resultSet.getString("customer_fullname"),
+                    resultSet.getDate("conclusion_date").toString()
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+
+fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, volume: Double): Double {
+    var preliminaryCost = 0.0
+
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM calculate_preliminary_cost($cityFrom, $cityTo, $weight, $volume)")
+            if (resultSet.next()) {
+                preliminaryCost = resultSet.getDouble(1)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+
+    return preliminaryCost
+}
+
+
+//адмэн
+fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period($start_date, $end_date)")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("manager_fullname"),
+                    resultSet.getString("contracts_count"),
+                    resultSet.getFloat("total_amount").toString()
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+
+fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period($start_date, $end_date)")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("driver_fullname"),
+                    resultSet.getInt("contracts_count").toString(),
+                    resultSet.getInt("hours_on_routes").toString()
                 )
                 result.add(row)
             }
