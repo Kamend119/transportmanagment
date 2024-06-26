@@ -116,7 +116,13 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
                 LazyColumn {
                     items(data.size) { index ->
                         val trip = data[index]
-                        Row {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
                             trip.forEach { item ->
                                 TableCell(text = item)
                             }

@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -5,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +58,11 @@ fun ManagerMainPage(onLogout: (Pages) -> Unit) {
                     items(data.size) { index ->
                         val trip = data[index]
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
                         ) {
                             trip.forEach { item ->
                                 TableCell(text = item)

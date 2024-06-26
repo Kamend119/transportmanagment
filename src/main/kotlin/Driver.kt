@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,12 +90,15 @@ fun DriverMainPage(
                     items(activeTrips.size) { index ->
                         val trip = activeTrips[index]
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     dialogWindow = true
                                     currentId = trip[0]
                                 }
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
                         ) {
                             trip.forEach { item ->
                                 TableCell(text = item)
@@ -146,9 +151,11 @@ fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
                     val header = headers[index]
                     val value = contractInfo.getOrElse(index) { "N/A" }
                     Row(
-                        Modifier
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                            .background(Color.Transparent)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         TableCell(text = header, isHeader = true)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -191,9 +198,12 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
                     items(declaration.size) { index ->
                         val trip = declaration[index]
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
-                        ) {
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        )  {
                             trip.forEach { item ->
                                 TableCell(text = item)
                             }
@@ -236,9 +246,12 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
                     items(declaration.size) { index ->
                         val trip = declaration[index]
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
-                        ) {
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        )  {
                             trip.forEach { item ->
                                 TableCell(text = item)
                             }
@@ -289,9 +302,12 @@ fun Declaration(onLogout: (Pages) -> Unit, contractID: String) {
                     items(declaration.size) { index ->
                         val trip = declaration[index]
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
-                        ) {
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        )  {
                             trip.forEach { item ->
                                 TableCell(text = item)
                             }

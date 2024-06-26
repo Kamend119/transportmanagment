@@ -84,8 +84,7 @@ fun TableHeader(headers: List<String>) {
             Text(
                 text = header,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.weight(1f)
+                color = Color.White
             )
         }
     }
