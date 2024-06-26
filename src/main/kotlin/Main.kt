@@ -77,7 +77,8 @@ fun TableHeader(headers: List<String>) {
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.primary)
-            .padding(8.dp)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         headers.forEach { header ->
             Text(
@@ -91,12 +92,14 @@ fun TableHeader(headers: List<String>) {
 }
 
 @Composable
-fun TableCell(text: String) {
+fun TableCell(text: String, isHeader: Boolean = false) {
     Text(
         text = text,
         Modifier
             .width(150.dp)
-            .padding(8.dp)
+            .padding(8.dp),
+        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
+        textAlign = TextAlign.Center
     )
 }
 
