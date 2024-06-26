@@ -275,21 +275,20 @@ fun viewAdditionalServicesInfo(): List<List<String>> {
     return result
 }
 
-// -------------------------------------
-
 fun viewDestinationPointsInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargo_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM destination_points_info")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("cargo_id").toString(),
-                    resultSet.getString("cargo_name"),
-                    resultSet.getString("cargo_classification_name"),
-                    resultSet.getFloat("weight").toString(),
-                    resultSet.getFloat("volume").toString(),
+                    resultSet.getInt("destination_point_id").toString(),
+                    resultSet.getString("type"),
+                    resultSet.getString("sity"),
+                    resultSet.getString("address"),
+                    resultSet.getDate("arrivaldate").toString(),
+                    resultSet.getString("status")
                 )
                 result.add(row)
             }
@@ -305,14 +304,14 @@ fun viewCustomersInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargo_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM customers_info")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("cargo_id").toString(),
-                    resultSet.getString("cargo_name"),
-                    resultSet.getString("cargo_classification_name"),
-                    resultSet.getFloat("weight").toString(),
-                    resultSet.getFloat("volume").toString(),
+                    resultSet.getInt("customer_id").toString(),
+                    resultSet.getString("lastname"),
+                    resultSet.getString("firstname"),
+                    resultSet.getString("patronymic"),
+                    resultSet.getString("phone")
                 )
                 result.add(row)
             }
@@ -328,14 +327,20 @@ fun viewContractInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargo_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contract_info")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("cargo_id").toString(),
-                    resultSet.getString("cargo_name"),
-                    resultSet.getString("cargo_classification_name"),
-                    resultSet.getFloat("weight").toString(),
-                    resultSet.getFloat("volume").toString(),
+                    resultSet.getInt("contract_id").toString(),
+                    resultSet.getDate("conclusiondate").toString(),
+                    resultSet.getFloat("cost").toString(),
+                    resultSet.getString("manager_fullname"),
+                    resultSet.getString("driver_fullname"),
+                    resultSet.getString("car_model"),
+                    resultSet.getString("car_brand"),
+                    resultSet.getString("car_licenseplate"),
+                    resultSet.getString("cargo_names"),
+                    resultSet.getString("destination_fulladdress"),
+                    resultSet.getString("additional_services")
                 )
                 result.add(row)
             }

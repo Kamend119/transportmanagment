@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun App() {
     var currentPage by remember { mutableStateOf(Pages.LoginPage) }
     var currentId by remember { mutableStateOf("") }
+    var currentTitle by remember { mutableStateOf("") }
 
     MaterialTheme {
         when (currentPage) {
