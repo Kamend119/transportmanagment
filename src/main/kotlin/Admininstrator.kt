@@ -48,6 +48,8 @@ fun AdministratorMainPage(onLogout: (Pages) -> Unit) {
     }
 }
 
+
+
 @Composable
 fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
     var data by remember {mutableStateOf(listOf(listOf("")))}

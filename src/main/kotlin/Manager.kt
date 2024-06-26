@@ -142,6 +142,8 @@ fun PreliminaryCost(onLogout: (Pages) -> Unit) {
             }){
                 Text("Расчитать")
             }
+
+            // нету вывода результатов
         }
     }
 }
