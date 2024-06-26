@@ -193,7 +193,7 @@ fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<S
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period($start_date, $end_date)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period('$start_date', '$end_date')")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("manager_fullname"),
@@ -214,7 +214,7 @@ fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period($start_date, $end_date)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period('$start_date', '$end_date')")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("driver_fullname"),
