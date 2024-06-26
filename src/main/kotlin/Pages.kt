@@ -12,8 +12,10 @@ enum class Pages {
 
     // менеджэр
     PreliminaryCost,
+    AdditionalServicesContract,
 
     //адмэн
     ContractsSummaryForManagers,
-    DriverPerformance
+    DriverPerformance,
+    FillInfoTripManager
 }

@@ -43,7 +43,9 @@ fun App() {
             Pages.DriverMainPage -> DriverMainPage({ userId, page ->
                 currentPage = page
                 currentId = userId }, { currentPage = it }, currentId)
-            Pages.ManagerMainPage -> ManagerMainPage { currentPage = it }
+            Pages.ManagerMainPage -> ManagerMainPage ({ userId, page ->
+                currentPage = page
+                currentId = userId }, { currentPage = it })
 
             // водитэл
             Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
@@ -53,10 +55,13 @@ fun App() {
 
             //менеджэр
             Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
+            Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
+
 
             //адмэн
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
             Pages.DriverPerformance -> DriverPerformance{ currentPage = it }
+            Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
 
         }
     }

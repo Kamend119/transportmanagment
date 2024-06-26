@@ -171,10 +171,12 @@ fun viewActiveContractInfo(): List<List<String>> {
 fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, volume: Double): Double {
     var preliminaryCost = 0.0
 
+    println("SELECT * FROM calculate_preliminary_cost($cityFrom, $cityTo, $weight, $volume)")
+
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM calculate_preliminary_cost($cityFrom, $cityTo, $weight, $volume)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM calculate_preliminary_cost('$cityFrom', '$cityTo', $weight, $volume)")
             if (resultSet.next()) {
                 preliminaryCost = resultSet.getDouble(1)
             }
@@ -185,6 +187,28 @@ fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, v
 
     return preliminaryCost
 }
+
+fun getAdditionalServices(contract_id: Int): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_additional_services($contract_id)")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("name"),
+                    resultSet.getFloat("cost").toString(),
+                    resultSet.getString("description"),
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+
 
 
 //адмэн
