@@ -13,6 +13,12 @@ enum class Pages {
     // менеджэр
     PreliminaryCost,
     AdditionalServicesContract,
+    CargosManager,
+    ClassificationManager,
+    AdditionalServicesManager,
+    DestinationPointsManager,
+    CustomerManager,
+    ContractManager,
 
     //адмэн
     ContractsSummaryForManagers,

@@ -57,6 +57,12 @@ fun App() {
             Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
             Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
 
+            Pages.CargosManager -> CargosManager{ currentPage = it }
+            Pages.ClassificationManager -> ClassificationManager{ currentPage = it }
+            Pages.AdditionalServicesManager -> AdditionalServicesManager{ currentPage = it }
+            Pages.DestinationPointsManager -> DestinationPointsManager{ currentPage = it }
+            Pages.CustomerManager -> CustomerManager{ currentPage = it }
+            Pages.ContractManager -> ContractManager{ currentPage = it }
 
             //адмэн
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }

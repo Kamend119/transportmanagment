@@ -24,6 +24,43 @@ fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
                 .padding(10.dp)
                 .clickable { onLogout(Pages.PreliminaryCost) }
                 .padding(15.dp))
+        Divider()
+        Text("Данные", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .padding(15.dp))
+        Divider()
+
+        Text("Грузы", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.CargosManager) }
+                .padding(15.dp))
+        Text("Классификация грузов", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.ClassificationManager) }
+                .padding(15.dp))
+        Text("Дополнительные услуги", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.AdditionalServicesManager) }
+                .padding(15.dp))
+        Text("Точки назначения", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.DestinationPointsManager) }
+                .padding(15.dp))
+        Text("Клиенты", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.CustomerManager) }
+                .padding(15.dp))
+        Text("Договоры", fontSize=18.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { onLogout(Pages.ContractManager) }
+                .padding(15.dp))
     }
 }
 
@@ -303,4 +340,34 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
             }
         }
     }
+}
+
+@Composable
+fun CargosManager(onLogout: (Pages) -> Unit){
+
+}
+
+@Composable
+fun ClassificationManager(onLogout: (Pages) -> Unit){
+
+}
+
+@Composable
+fun AdditionalServicesManager(onLogout: (Pages) -> Unit){
+
+}
+
+@Composable
+fun DestinationPointsManager(onLogout: (Pages) -> Unit){
+
+}
+
+@Composable
+fun CustomerManager(onLogout: (Pages) -> Unit){
+
+}
+
+@Composable
+fun ContractManager(onLogout: (Pages) -> Unit){
+
 }
