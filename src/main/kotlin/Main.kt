@@ -1,4 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -16,6 +17,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.FileDialog
@@ -70,22 +73,30 @@ fun main() = application {
 
 @Composable
 fun TableHeader(headers: List<String>) {
-    Row(Modifier.fillMaxWidth()) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primary)
+            .padding(8.dp)
+    ) {
         headers.forEach { header ->
-            TableCell(text = header, isHeader = true)
+            Text(
+                text = header,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
 @Composable
-fun TableCell(text: String, isHeader: Boolean = false) {
+fun TableCell(text: String) {
     Text(
         text = text,
         Modifier
             .width(150.dp)
-            .padding(8.dp),
-        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center
+            .padding(8.dp)
     )
 }
 
