@@ -660,8 +660,3 @@ fun ContractManager(onLogout: (Pages) -> Unit) {
         }
     }
 }
-
-@Composable
-fun ContractUpdateManager(){
-
-}
