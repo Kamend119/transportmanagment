@@ -61,8 +61,14 @@ fun App() {
             // водитэл
             Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
             Pages.CargosWithTripDriver -> CargosWithTripDriver({ currentPage = it }, currentId)
-            Pages.DepartPointsDriver -> DepartPointsDriver({ currentPage = it }, currentId)
+            Pages.DepartPointsDriver -> DepartPointsDriver({ currentPage = it }, currentId,
+                {page, id ->
+                    currentPage = page
+                    currentId = id
+                })
             Pages.DeclarationDriver -> DeclarationDriver({ currentPage = it }, currentId)
+            Pages.UpdateStatus -> UpdateStatus({ currentPage = it }, currentId)
+
 
             //менеджэр
             Pages.PreliminaryCostManager -> PreliminaryCostManager{ currentPage = it }

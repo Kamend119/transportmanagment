@@ -1,3 +1,4 @@
+import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
@@ -121,8 +122,9 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
+            println("SELECT * FROM get_contract_destination_points(${contractId.toInt()})")
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_destination_points($contractId)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_destination_points(${contractId.toInt()})")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("destination_point_id").toString()?: "",
@@ -140,6 +142,19 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
     }
     return result
 }
+fun updateStatusDestinationPoints(contractId: String, status: String) {
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            println("SELECT * FROM update_destination_status(${contractId.toInt()}, '$status')")
+            val statement: PreparedStatement =
+                connection.prepareStatement("SELECT * FROM update_destination_status(${contractId.toInt()}, '$status')")
+            statement.executeUpdate()
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+}
+
 // менеджэр
 fun viewActiveContractInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()

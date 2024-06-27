@@ -9,6 +9,7 @@ enum class Pages {
     CargosWithTripDriver,
     DepartPointsDriver,
     DeclarationDriver,
+    UpdateStatus,
 
     // менеджэр
     AdditionalServicesContract,
