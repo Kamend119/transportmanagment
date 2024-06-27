@@ -8,19 +8,24 @@ enum class Pages {
     FillInfoTripDriver,
     CargosWithTripDriver,
     DepartPointsDriver,
-    Declaration,
+    DeclarationDriver,
 
     // менеджэр
     PreliminaryCost,
     AdditionalServicesContract,
+    FillInfoTripManager,
 
     DataManager,
 
     //адмэн
     ContractsSummaryForManagers,
     DriverPerformance,
-    FillInfoTripManager,
 
+    DeclarationAdministrator,
+    PreliminaryCostAdmin,
+    FillInfoTripAdministrator,
+
+    ReportsAdministrator,
     DataAdministrator,
 
     //

@@ -12,43 +12,213 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AdministratorDrawerContent(onLogout: (Pages) -> Unit){
-    Column {
-        Text("Отчетность", fontSize=18.sp,
-            modifier = Modifier
-                .padding(10.dp)
-                .padding(15.dp))
-        Divider()
-        Text("Статистика менеджеров", fontSize=18.sp,
-            modifier = Modifier
-                .padding(10.dp)
-                .clickable { onLogout(Pages.ContractsSummaryForManagers) }
-                .padding(15.dp))
-        Text("Статистика водителей", fontSize=18.sp,
-            modifier = Modifier
-                .padding(10.dp)
-                .clickable { onLogout(Pages.DriverPerformance) }
-                .padding(15.dp))
-        Divider()
-        Text("Документы", fontSize=18.sp,
-            modifier = Modifier
-                .padding(10.dp)
-                .padding(15.dp))
-        Divider()
-    }
-}
+fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: String, page: Pages) -> Unit) {
+    var data by remember { mutableStateOf(listOf(listOf(""))) }
+    var dialogWindow by remember { mutableStateOf(false) }
+    var currentId by remember { mutableStateOf("") }
 
-@Composable
-fun AdministratorMainPage(onLogout: (Pages) -> Unit) {
+    LaunchedEffect(Unit) {
+        data = viewActiveContractInfo()
+    }
+
+    if (dialogWindow) {
+        AlertDialog(
+            onDismissRequest = { dialogWindow = false },
+            title = { Text(text = "Рейс №$currentId.") },
+            text = { Text("Выберите действие") },
+            buttons = {
+                Column(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.FillInfoTripAdministrator)
+                    }) {
+                        Text("Просмотреть полную информацию", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(currentId, Pages.DeclarationAdministrator)
+                    }) {
+                        Text("Создать декларацию на грузы", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
+
     MainScaffold(
         title = "Администратор",
         onLogout = onLogout
     ) {
-
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Активные договоры", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TableHeader(headers = listOf("ID", "ФИО менеджера", "ФИО клиента", "Дата заключения"))
+                LazyColumn {
+                    items(data.size) { index ->
+                        val trip = data[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    dialogWindow = true
+                                    currentId = trip[0]
+                                }
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
+@Composable
+fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
+    var data by remember { mutableStateOf(0.0) }
+    var cityFrom by remember { mutableStateOf("") }
+    var cityTo by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf(0.0) }
+    var volume by remember { mutableStateOf(0.0) }
+    var dialogWindow by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(false) }
 
+    if (dialogWindow) {
+        if (error){
+            AlertDialog(
+                onDismissRequest = { dialogWindow = false
+                    error = false},
+                title = { Text(text = "Не верные данные") },
+                text = { Text("Данные не должны быть пустыми!") },
+                confirmButton = {
+                    Button(onClick = { dialogWindow = false
+                        error = false}) {
+                        Text("OK", fontSize = 22.sp)
+                    }
+                }
+            )
+        }
+        else {
+            AlertDialog(
+                onDismissRequest = { dialogWindow = false },
+                title = { Text(text = "Стоимость грузоперевозки") },
+                text = { Text("Предварительная стоимость = $data") },
+                confirmButton = {
+                    Button(onClick = { dialogWindow = false }) {
+                        Text("OK", fontSize = 22.sp)
+                    }
+                }
+            )
+        }
+    }
+
+    MainScaffold(
+        title = "Администратор",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Предварительная стоимость грузоперевозки", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+
+            OutlinedTextField(
+                cityFrom,
+                onValueChange = { cityFrom = it },
+                label = { Text("Город отправления") }
+            )
+
+            OutlinedTextField(
+                cityTo,
+                onValueChange = { cityTo = it },
+                label = { Text("Город доставки") }
+            )
+
+            OutlinedTextField(
+                weight.toString(),
+                onValueChange = { weight = it.toDouble() },
+                label = { Text("Вес") }
+            )
+
+            OutlinedTextField(
+                volume.toString(),
+                onValueChange = { volume = it.toDouble() },
+                label = { Text("Объем") }
+            )
+
+            Button(onClick = {
+                if (cityTo.isNotEmpty() && cityFrom.isNotEmpty() && weight != 0.0 && volume != 0.0) {
+                    data = calculatePreliminaryCost(cityFrom, cityTo, weight, volume)
+                    dialogWindow = true
+                }
+                else {
+                    dialogWindow = true
+                    error = true
+                }
+            }){
+                Text("Расчитать")
+            }
+        }
+    }
+}
+
+@Composable
+fun ReportsAdministrator(onLogout: (Pages) -> Unit){
+    MainScaffold(
+        title = "Администратор",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Данные", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            LazyColumn(
+                Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(30.dp)
+            ) {
+                item {
+                    Text("Статистика менеджеров", fontSize=18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable { onLogout(Pages.ContractsSummaryForManagers) }
+                            .padding(15.dp))
+                    Text("Статистика водителей", fontSize=18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable { onLogout(Pages.DriverPerformance) }
+                            .padding(15.dp))
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
@@ -429,6 +599,136 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                             }
                             .padding(10.dp)
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        declaration = generateCargoDeclaration(contractID)
+    }
+
+    if (showDialog) {
+        val filePath = SelectFileDialog {
+            showDialog = false
+        }
+        println(filePath)
+    }
+
+    MainScaffold(
+        title = "Администратор",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TableHeader(headers = listOf("Наименование", "Объем", "Вес", "Описание"))
+                LazyColumn {
+                    items(declaration.size) { index ->
+                        val trip = declaration[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent)
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        )  {
+                            trip.forEach { item ->
+                                TableCell(text = item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Button(
+                onClick = {
+                    showDialog = true
+//                    saveToCsv(declaration, contractID)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Сохранить в CSV")
+            }
+        }
+    }
+}
+
+@Composable
+fun FillInfoTripAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
+    var declaration by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        declaration = getContractInfo(contractID)
+    }
+
+    MainScaffold(
+        title = "Администратор",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Договор №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+            val headers = listOf(
+                "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
+                "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
+                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
+                "Адрес", "Дата", "Дополнительные услуги"
+            )
+
+            val contractInfo = declaration.getOrNull(0) ?: listOf()
+
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(headers.size) { index ->
+                    val header = headers[index]
+                    val value = contractInfo.getOrElse(index) { "N/A" }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        TableCell(text = header, isHeader = true)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TableCell(text = value)
+                    }
                 }
             }
         }

@@ -57,7 +57,7 @@ fun DriverMainPage(
                     }
                     Button(onClick = {
                         dialogWindow = false
-                        onLoginSuccess(currentId, Pages.Declaration)
+                        onLoginSuccess(currentId, Pages.DeclarationDriver)
                     }) {
                         Text("Создать декларацию на грузы", fontSize = 15.sp)
                     }
@@ -264,7 +264,7 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
 }
 
 @Composable
-fun Declaration(onLogout: (Pages) -> Unit, contractID: String) {
+fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
     var showDialog by remember { mutableStateOf(false) }
 

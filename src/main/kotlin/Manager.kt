@@ -12,33 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
-    LazyColumn {
-        item {
-            Text(
-                "Доставка", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .padding(15.dp)
-            )
-            Divider()
-            Text("Расчитать предварительную стоимость", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.PreliminaryCost) }
-                    .padding(15.dp))
-            Divider()
-            Text(
-                "Данные", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .padding(15.dp)
-            )
-        }
-    }
-}
-
-@Composable
 fun ManagerMainPage(
     onLoginSuccess: (userData: String, page: Pages) -> Unit,
     onLogout: (page: Pages) -> Unit

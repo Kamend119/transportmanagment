@@ -45,7 +45,11 @@ fun App() {
                 currentId = userId
             }
 
-            Pages.AdministratorMainPage -> AdministratorMainPage { currentPage = it }
+            Pages.AdministratorMainPage -> AdministratorMainPage ({ currentPage = it },
+                { userId, page ->
+                currentPage = page
+                currentId = userId },
+            )
             Pages.DriverMainPage -> DriverMainPage({ userId, page ->
                 currentPage = page
                 currentId = userId }, { currentPage = it }, currentId)
@@ -58,11 +62,12 @@ fun App() {
             Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
             Pages.CargosWithTripDriver -> CargosWithTripDriver({ currentPage = it }, currentId)
             Pages.DepartPointsDriver -> DepartPointsDriver({ currentPage = it }, currentId)
-            Pages.Declaration -> Declaration({ currentPage = it }, currentId)
+            Pages.DeclarationDriver -> DeclarationDriver({ currentPage = it }, currentId)
 
             //менеджэр
             Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
             Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
+            Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
             Pages.DataManager -> DataManager ({currentPage = it}, { title, head, table, currentPagess, page ->
                 currentTitle = title
                 currentHead = head
@@ -71,11 +76,10 @@ fun App() {
                 currentPage = page
             })
 
-
             //адмэн
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
             Pages.DriverPerformance -> DriverPerformance{ currentPage = it }
-            Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
+            Pages.FillInfoTripAdministrator -> FillInfoTripAdministrator({ currentPage = it }, currentId)
             Pages.DataAdministrator -> DataAdministrator ({currentPage = it}, { title, head, table, currentPagess, page ->
                 currentTitle = title
                 currentHead = head
@@ -83,6 +87,9 @@ fun App() {
                 currentPages = currentPagess
                 currentPage = page
             })
+            Pages.ReportsAdministrator -> ReportsAdministrator{ currentPage = it }
+            Pages.PreliminaryCostAdmin -> PreliminaryCost{ currentPage = it }
+            Pages.DeclarationAdministrator -> DeclarationAdministrator({ currentPage = it }, currentId)
 
 
             //
@@ -94,7 +101,6 @@ fun App() {
                 currentId,
                 currentPages
             )
-
             Pages.TablePage -> TablePage(
                 onLogout = { page -> currentPage = page },
                 titles = currentTitle,
@@ -109,7 +115,6 @@ fun App() {
                     currentPage = page
                 }
             )
-
             Pages.AddPage -> AddPage(
                 { page -> currentPage = page },
                 currentTitle,
@@ -165,17 +170,11 @@ fun TableCell(text: String, isHeader: Boolean = false) {
 @Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
 
     ModalDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            when (title) {
-                    "Администратор" -> AdministratorDrawerContent(onLogout)
-                    "Менеджер" -> ManagerDrawerContent(onLogout)
-            }
-        },
+        drawerContent = {},
         content = {
             Scaffold(
                 topBar = {
@@ -214,26 +213,44 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                                 IconButton(onClick = {
                                     onLogout(Pages.ManagerMainPage)
                                 }) {
-                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                                    Icon(Icons.Default.Home, "Главная страница")
                                 }
 
                                 IconButton(onClick = {
                                     onLogout(Pages.DataManager)
                                 }) {
-                                    Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                                    Icon(Icons.Filled.Settings, "Данные")
+                                }
+
+                                IconButton(onClick = {
+                                    onLogout(Pages.PreliminaryCost)
+                                }){
+                                    Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
                                 }
                             }
                             else{
                                 IconButton(onClick = {
                                     onLogout(Pages.AdministratorMainPage)
                                 }) {
-                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                                    Icon(Icons.Default.Home,  "Главная страница")
                                 }
 
                                 IconButton(onClick = {
                                     onLogout(Pages.DataAdministrator)
                                 }) {
-                                    Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                                    Icon(Icons.Filled.Settings, "Данные")
+                                }
+
+                                IconButton(onClick = {
+                                    onLogout(Pages.PreliminaryCostAdmin)
+                                }){
+                                    Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
+                                }
+
+                                IconButton(onClick = {
+                                    onLogout(Pages.ReportsAdministrator)
+                                }){
+                                    Icon(Icons.Default.Check, "Отчетность")
                                 }
                             }
                         }
