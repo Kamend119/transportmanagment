@@ -363,15 +363,15 @@ fun viewContractInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString(),
-                    resultSet.getDate("conclusiondate").toString(),
-                    resultSet.getFloat("cost").toString(),
-                    resultSet.getInt("customer_id").toString(),
-                    resultSet.getInt("manager_id").toString(),
-                    resultSet.getInt("driver_id").toString(),
-                    resultSet.getInt("car_id").toString(),
-                    resultSet.getInt("destinationpoint_id").toString(),
-                    resultSet.getString("status")
+                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getDate("conclusiondate").toString()?: "",
+                    resultSet.getFloat("cost").toString()?: "",
+                    resultSet.getInt("customer_id").toString()?: "",
+                    resultSet.getInt("manager_id").toString()?: "",
+                    resultSet.getInt("driver_id").toString()?: "",
+                    resultSet.getInt("car_id").toString()?: "",
+                    resultSet.getInt("destinationpoint_id").toString()?: "",
+                    resultSet.getString("status")?: ""
                 )
                 result.add(row)
             }

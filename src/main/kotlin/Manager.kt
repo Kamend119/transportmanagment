@@ -318,7 +318,6 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
     }
 }
 
-
 @Composable
 fun DataManager(onLogout: (Pages) -> Unit,
     onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
@@ -421,7 +420,7 @@ fun DataManager(onLogout: (Pages) -> Unit,
                                 onLoginSuccess(
                                     "Менеджер",
                                     listOf("ID","Дата заключения","Стоимость","ID клиента",
-                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения"),
+                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения", "Статус"),
                                     "Договоры",
                                     Pages.DataManager,
                                     Pages.TablePage

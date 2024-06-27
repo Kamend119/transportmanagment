@@ -23,4 +23,5 @@ enum class Pages {
     //
     UpdatePage,
     TablePage,
+    AddPage
 }

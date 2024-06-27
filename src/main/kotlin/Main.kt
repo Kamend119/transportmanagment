@@ -101,6 +101,15 @@ fun App() {
                     currentPage = page
                 }
             )
+
+            Pages.AddPage -> AddPage(
+                { page -> currentPage = page },
+                currentTitle,
+                currentHead,
+                currentTable,
+                currentId,
+                currentPages
+            )
         }
     }
 }
@@ -359,11 +368,12 @@ fun TablePage(
             "Клиенты" -> viewCustomersInfo()
             "Классификация грузов" -> viewClassCargosInfo()
             "Дополнительные услуги" -> viewAdditionalServicesInfo()
-            "Договор" -> viewContractInfo()
+            "Договоры" -> viewContractInfo()
             "Договор Дополнительные услуги" -> viewContractAdditionalService()
             else -> viewCargoInfo()
         }
     }
+    println(data)
 
     if (dialogWindow) {
         AlertDialog(
@@ -411,7 +421,7 @@ fun TablePage(
                             "Клиенты" -> deleteCustomer(currentId.toInt())
                             "Классификация грузов" -> deleteCargoClass(currentId.toInt())
                             "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
-                            "Договор" -> deleteContract(currentId.toInt())
+                            "Договоры" -> deleteContract(currentId.toInt())
                             "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
                             else -> deleteCargo(currentId.toInt())
                         }
@@ -432,36 +442,46 @@ fun TablePage(
         title = titles,
         onLogout = onLogout
     ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = heads)
-            LazyColumn {
-                items(data.size) { index ->
-                    val row = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .clickable {
-                                currentId = row[0]
-                                dialogWindow = true
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }){
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+                TableHeader(headers = heads)
+                LazyColumn {
+                    items(data.size) { index ->
+                        val row = data[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent)
+                                .clickable {
+                                    currentId = row[0]
+                                    dialogWindow = true
+                                }
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            row.forEach { item ->
+                                TableCell(text = item)
                             }
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        row.forEach { item ->
-                            TableCell(text = item)
                         }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -481,7 +501,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
             "Клиенты" -> getCustomer(currentId.toInt())
             "Классификация грузов" -> getCargoClass(currentId.toInt())
             "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
-            "Договор" -> getContract(currentId.toInt())
+            "Договоры" -> getContract(currentId.toInt())
             "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
             else -> getCargo(currentId.toInt())
         }
@@ -508,7 +528,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                             "Клиенты" -> updateCustomer(data)
                             "Классификация грузов" -> updateCargoClass(data)
                             "Дополнительные услуги" -> updateAdditionalService(data)
-                            "Договор" -> updateContract(data)
+                            "Договоры" -> updateContract(data)
                             "Договор Дополнительные услуги" -> updateContractAdditionalService(data)
                             else -> updateCargo(data)
                         }
@@ -562,6 +582,129 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                     dialogWindow = true
                 }){
                     Text("Сохранить")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String,
+    currentId: String, currentPagess: Pages ) {
+    var data by remember { mutableStateOf(List(head.size) { "" }) }
+    var inDay by remember { mutableStateOf(listOf<String>()) }
+    var passport by remember { mutableStateOf(List(4) { "" }) }
+
+    MainScaffold(
+        title = title,
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Добавить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+            Column(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                if (table != "Сотрудники") {
+                    head.forEachIndexed { i, label ->
+                        if (head[i] != "ID"){
+                            OutlinedTextField(
+                                value = data[i],
+                                onValueChange = { newData ->
+                                    data = data.toMutableList().also { it[i] = newData }
+                                },
+                                label = { Text(label) }
+                            )
+                        }
+                    }
+                } else {
+                    head.forEachIndexed { i, label ->
+                        if (head[i] != "ID") {
+                            when (label) {
+                                "Паспортные данные" -> {
+                                    listOf(
+                                        "Серия",
+                                        "Номер",
+                                        "Когда выдан",
+                                        "Кем выдан"
+                                    ).forEachIndexed { index, passportField ->
+                                        OutlinedTextField(
+                                            value = passport[index],
+                                            onValueChange = { newData ->
+                                                passport = passport.toMutableList().also { it[index] = newData }
+                                            },
+                                            label = { Text(passportField) }
+                                        )
+                                    }
+                                }
+
+                                "Рабочие дни" -> {
+                                    val daysOfWeek = listOf(
+                                        "Понедельник",
+                                        "Вторник",
+                                        "Среда",
+                                        "Четверг",
+                                        "Пятница",
+                                        "Суббота",
+                                        "Воскресенье"
+                                    )
+                                    daysOfWeek.forEach { day ->
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Checkbox(
+                                                checked = inDay.contains(day),
+                                                onCheckedChange = { checked ->
+                                                    inDay = if (checked) {
+                                                        inDay + day
+                                                    } else {
+                                                        inDay - day
+                                                    }
+                                                }
+                                            )
+                                            Text(text = day)
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    OutlinedTextField(
+                                        value = data[i],
+                                        onValueChange = { newData ->
+                                            data = data.toMutableList().also { it[i] = newData }
+                                        },
+                                        label = { Text(label) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button(onClick = {
+                    when (table) {
+                        "Контактные лица" -> createContact(data)
+                        "Автопарки" -> createAutopark(data)
+                        "Автомобили" -> createCar(data)
+                        "Должности" -> createJob(data)
+                        "Сотрудники" -> createEmployee(data, inDay, passport)
+                        "Точки назначения" -> createDestinationPoint(data)
+                        "Клиенты" -> createCustomer(data)
+                        "Классификация грузов" -> createCargoClass(data)
+                        "Дополнительные услуги" -> createAdditionalService(data)
+                        "Договоры" -> createContract(data)
+                        "Договор Дополнительные услуги" -> createContractAdditionalService(data)
+                        else -> createCargo(data)
+                    }
+                    onLogout(Pages.TablePage)
+                }) {
+                    Text("Добавить")
                 }
             }
         }
