@@ -499,7 +499,7 @@ fun TablePage(
                     .fillMaxSize()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
                 TableHeader(headers = heads)
