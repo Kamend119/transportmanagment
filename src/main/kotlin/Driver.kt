@@ -272,16 +272,20 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String, onLoginSuc
 fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
     var showDialog by remember { mutableStateOf(false) }
+    var savePath by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         declaration = generateCargoDeclaration(contractID)
     }
 
     if (showDialog) {
-        val filePath = SelectFileDialog {
+        SelectFileDialog(onDialogDismiss = { selectedPath ->
             showDialog = false
-        }
-        println(filePath)
+            savePath = selectedPath
+            if (savePath.isNotEmpty()) {
+                saveToCsv(declaration, contractID, savePath)
+            }
+        })
     }
 
     MainScaffold(
@@ -312,7 +316,7 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
                                 .background(Color.Transparent)
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceAround
-                        )  {
+                        ) {
                             trip.forEach { item ->
                                 TableCell(text = item)
                             }
@@ -332,7 +336,6 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
             Button(
                 onClick = {
                     showDialog = true
-//                    saveToCsv(declaration, contractID)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {

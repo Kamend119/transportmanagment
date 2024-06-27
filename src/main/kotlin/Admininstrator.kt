@@ -236,6 +236,8 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
     var endDate by remember { mutableStateOf(TextFieldValue("")) }
     var dialogWindow by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var savePath by remember { mutableStateOf("") }
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     if (dialogWindow) {
@@ -251,6 +253,16 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
         )
     }
 
+    if (showDialog) {
+        SelectFileDialog(onDialogDismiss = { selectedPath ->
+            showDialog = false
+            savePath = selectedPath
+            if (savePath.isNotEmpty()) {
+                saveToCsv(data, "contracts_summary", savePath)
+            }
+        })
+    }
+
     MainScaffold(
         title = "Администратор",
         onLogout = onLogout
@@ -262,13 +274,13 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Row (
+            Row(
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 OutlinedTextField(
                     value = startDate,
                     onValueChange = { startDate = it },
@@ -299,6 +311,14 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
                     }
                 }) {
                     Text("Расчитать")
+                }
+
+                Button(
+                    onClick = {
+                        showDialog = true
+                    }
+                ) {
+                    Text("Сохранить в CSV")
                 }
             }
 
@@ -337,6 +357,8 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
     var end_date by remember { mutableStateOf(TextFieldValue("")) }
     var dialogWindow by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var savePath by remember { mutableStateOf("") }
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     if (dialogWindow) {
@@ -352,6 +374,16 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
         )
     }
 
+    if (showDialog) {
+        SelectFileDialog(onDialogDismiss = { selectedPath ->
+            showDialog = false
+            savePath = selectedPath
+            if (savePath.isNotEmpty()) {
+                saveToCsv(data, "driver_performance", savePath)
+            }
+        })
+    }
+
     MainScaffold(
         title = "Администратор",
         onLogout = onLogout
@@ -363,13 +395,13 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Row (
+            Row(
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 OutlinedTextField(
                     value = start_date,
                     onValueChange = { start_date = it },
@@ -400,6 +432,14 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
                     }
                 }) {
                     Text("Расчитать")
+                }
+
+                Button(
+                    onClick = {
+                        showDialog = true
+                    }
+                ) {
+                    Text("Сохранить в CSV")
                 }
             }
 

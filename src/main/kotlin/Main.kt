@@ -26,6 +26,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.FileDialog
 import java.io.File
+import java.io.PrintWriter
+import javax.swing.JFileChooser
 
 @Composable
 @Preview
@@ -349,10 +351,10 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     }
 }
 
-fun saveToCsv(data: List<List<String>>, contractID: String) {
-    val outputFile = File("declaration_$contractID.csv")
+fun saveToCsv(data: List<List<String>>, contractID: String, filePath: String) {
+    val outputFile = File(filePath)
 
-    outputFile.printWriter().use { out ->
+    PrintWriter(outputFile).use { out ->
         // Write header
         out.println("Наименование,Объем,Вес,Описание")
 
@@ -362,39 +364,28 @@ fun saveToCsv(data: List<List<String>>, contractID: String) {
         }
     }
 
-    println("CSV file saved successfully.")
+    println("CSV file saved successfully to $filePath.")
 }
 
 @Composable
 fun SelectFileDialog(
-    onDialogDismiss: () -> Unit
-): String {
-    val dialogState = rememberDialogState()
+    onDialogDismiss: (String) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
-    var filePath by remember { mutableStateOf("") }
 
-    Dialog(
-        state = dialogState,
-        title = "Select File or Folder",
-        onCloseRequest = onDialogDismiss
-    ) {
-        val fileDialog = remember { FileDialog(null as java.awt.Frame?, "Select File or Folder", FileDialog.LOAD) }
-
+    LaunchedEffect(Unit) {
         coroutineScope.launch {
-            fileDialog.isVisible = true
-            fileDialog.toFront()
-            fileDialog.requestFocus()
-
-            fileDialog.isVisible = false
-
-            val chosenFile = File(fileDialog.directory, fileDialog.file)
-            filePath = chosenFile.absolutePath
+            val fileChooser = JFileChooser().apply {
+                fileSelectionMode = JFileChooser.FILES_ONLY
+            }
+            val result = fileChooser.showSaveDialog(null)
+            if (result == JFileChooser.APPROVE_OPTION) {
+                onDialogDismiss(fileChooser.selectedFile.absolutePath)
+            } else {
+                onDialogDismiss("")
+            }
         }
     }
-    if (filePath != "") {
-        return filePath
-    }
-    return ""
 }
 
 @Composable
