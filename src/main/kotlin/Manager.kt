@@ -1,10 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ManagerDrawerContent(onLogout: ((page: Pages, title: String?, head: List<String>?, table: String?) -> Unit)? = null, onLoginSuccess: ((page: Pages, title: String, head: List<String>, table: String) -> Unit)? = null){
+fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
     LazyColumn {
         item {
             Text(
@@ -37,45 +34,6 @@ fun ManagerDrawerContent(onLogout: ((page: Pages, title: String?, head: List<Str
                     .padding(10.dp)
                     .padding(15.dp)
             )
-            Divider()
-
-            Text("Грузы", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable {
-                        onLoginSuccess(
-                            Pages.TablePage,
-                            "Менеджер",
-                            listOf("ID", "Наименование", "Классификация", "Вес", "Объем"),
-                            "Грузы"
-                        )
-                    }
-                    .padding(15.dp))
-            Text("Классификация грузов", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.ClassificationManager) }
-                    .padding(15.dp))
-            Text("Дополнительные услуги", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.AdditionalServicesManager) }
-                    .padding(15.dp))
-            Text("Точки назначения", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.DestinationPointsManager) }
-                    .padding(15.dp))
-            Text("Клиенты", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.CustomerManager) }
-                    .padding(15.dp))
-            Text("Договоры", fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable { onLogout(Pages.ContractManager) }
-                    .padding(15.dp))
         }
     }
 }
@@ -83,7 +41,7 @@ fun ManagerDrawerContent(onLogout: ((page: Pages, title: String?, head: List<Str
 @Composable
 fun ManagerMainPage(
     onLoginSuccess: (userData: String, page: Pages) -> Unit,
-    onLogout: () -> Unit
+    onLogout: (page: Pages) -> Unit
 ) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
     var dialogWindow by remember { mutableStateOf(false) }
@@ -362,125 +320,9 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
 
 
 @Composable
-fun TablePage(
-    onLogout: (Pages) -> Unit, titles: String, heads: List<String>, tables: String,
-    onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
+fun DataManager(onLogout: (Pages) -> Unit,
+    onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
 ){
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-
-    LaunchedEffect(Unit) {
-        data = when (tables){
-            "Контактные лица" -> viewContactsInfo()
-            "Автопарки" -> viewAutoparkInfo()
-            "Автомобили" -> viewCarInfo()
-            "Должности" -> viewJobsInfo()
-            "Сотрудники" -> viewEmployeeInfo()
-            "Точки назначения" -> viewDestinationPointsInfo()
-            "Клиенты" -> viewCustomersInfo()
-            "Классификация грузов" -> viewClassCargosInfo()
-            "Дополнительные услуги" -> viewAdditionalServicesInfo()
-            "Договор" -> viewContractInfo()
-            "Договор Дополнительные услуги" -> viewContractAdditionalService()
-            else -> viewCargoInfo()
-        }
-    }
-
-    MainScaffold(
-        title = titles,
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = heads)
-            LazyColumn {
-                items(data.size) { index ->
-                    val row = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .clickable {
-                                onLoginSuccess(titles, heads, tables, row[0], Pages.TablePage, Pages.UpdatePage)
-                            }
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        row.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CargosManager(
-    onLogout: (Pages) -> Unit,
-    onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
-) {
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-    val table = "Грузы"
-    val head = listOf(
-        "ID", "Наименование", "Классификация", "Вес", "Объем"
-    )
-    val title = "Менеджер"
-
-    LaunchedEffect(Unit) {
-        data = viewCargoInfo()
-    }
-
-    MainScaffold(
-        title = title,
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text(table, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = head)
-            LazyColumn {
-                items(data.size) { index ->
-                    val cargo = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .clickable {
-                                onLoginSuccess(title, head, table, cargo[0], Pages.CargosManager, Pages.UpdatePage)
-                            }
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        cargo.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ClassificationManager(onLogout: (Pages) -> Unit){
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-
-    LaunchedEffect(Unit) {
-        data = viewClassCargosInfo()
-    }
-
     MainScaffold(
         title = "Менеджер",
         onLogout = onLogout
@@ -492,348 +334,104 @@ fun ClassificationManager(onLogout: (Pages) -> Unit){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Классификация грузов", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = listOf(
-                "ID", "Наименование", "Описание"
-            ))
-            LazyColumn {
-                items(data.size) { index ->
-                    val trip = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    )  {
-                        trip.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AdditionalServicesManager(onLogout: (Pages) -> Unit){
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-
-    LaunchedEffect(Unit) {
-        data = viewAdditionalServicesInfo()
-    }
-
-    MainScaffold(
-        title = "Менеджер",
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text("Дополнительные услуги", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = listOf(
-                "ID", "Наименование", "Стоимость",  "Описание"
-            ))
-            LazyColumn {
-                items(data.size) { index ->
-                    val trip = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    )  {
-                        trip.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DestinationPointsManager(onLogout: (Pages) -> Unit){
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-
-    LaunchedEffect(Unit) {
-        data = viewDestinationPointsInfo()
-    }
-
-    MainScaffold(
-        title = "Менеджер",
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text("Точки назначения", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = listOf(
-                "ID", "Тип", "Город",  "Адрес", "Дата", "Статус"
-            ))
-            LazyColumn {
-                items(data.size) { index ->
-                    val trip = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    )  {
-                        trip.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CustomerManager(onLogout: (Pages) -> Unit){
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-
-    LaunchedEffect(Unit) {
-        data = viewCustomersInfo()
-    }
-
-    MainScaffold(
-        title = "Менеджер",
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text("Клиенты", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = listOf(
-                "ID", "Фамилия", "Имя",  "Отчество", "Номер телефона"
-            ))
-            LazyColumn {
-                items(data.size) { index ->
-                    val trip = data[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    )  {
-                        trip.forEach { item ->
-                            TableCell(text = item)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ContractManager(onLogout: (Pages) -> Unit) {
-    var data by remember { mutableStateOf(listOf(listOf(""))) }
-    var dialogWindow by remember { mutableStateOf(false) }
-    var currentId by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        data = viewContractInfo()
-    }
-
-    if (dialogWindow) {
-        AlertDialog(
-            onDismissRequest = { dialogWindow = false },
-            title = { Text(text = "Договор №$currentId.") },
-            text = { Text("Выберите действие") },
-            buttons = {
-                Column(
-                    Modifier.padding(25.dp)
-                ) {
-                    Button(onClick = {
-                        dialogWindow = false
-                        //onLoginSuccess(currentId, Pages.FillInfoTripManager)
-                    }) {
-                        Text("Изменить данные", fontSize = 15.sp)
-                    }
-                    Button(onClick = {
-                        dialogWindow = false
-                        //
-                    }) {
-                        Text("Удалить данные", fontSize = 15.sp)
-                    }
-                }
-            }
-        )
-    }
-
-    MainScaffold(
-        title = "Менеджер",
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text("Договор", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-
-            val headers = listOf(
-                "ID", "Дата заключения договора", "Стоимость",
-                "ФИО менеджера", "ФИО водителя", "Производитель автомобиля",
-                "Модель автомобиля", "Номер автомобиля", "Грузы",
-                "Точки назначения", "Дополнительные услуги"
-            )
-
-            Column(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+            Text("Данные", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            LazyColumn(
+                Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(30.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .background(MaterialTheme.colors.primary)
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    headers.forEach { header ->
-                        TableCell(text = header, isHeader = true)
-                    }
-                }
-
-                LazyColumn {
-                    items(data) { rowData ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.Transparent)
-                                .clickable {
-                                    dialogWindow = true
-                                    currentId = rowData[0]
-                                }
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            rowData.forEach { cellData ->
-                                TableCell(text = cellData)
+                item {
+                    Text("Грузы", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"),
+                                    "Грузы",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
                             }
-                        }
-                    }
+                            .padding(10.dp)
+                    )
+                    Text("Классификация грузов", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID", "Название", "Описание"),
+                                    "Классификация грузов",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Дополнительные услуги", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID", "Название", "Стоимость", "Описание"),
+                                    "Дополнительные услуги",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+
+                    Text("Точки назначения", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус"),
+                                    "Точки назначения",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+
+                    Text("Клиенты", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"),
+                                    "Клиенты",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+
+                    Text("Договоры", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Менеджер",
+                                    listOf("ID","Дата заключения","Стоимость","ID клиента",
+                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения"),
+                                    "Договоры",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
                 }
             }
         }
     }
 }
 
-
-@Composable
-fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages){
-    var data by remember { mutableStateOf(listOf("")) }
-    var dialogWindow by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        data = when (table){
-            "Контактные лица" -> getContact(currentId.toInt())
-            "Автопарки" -> getAutopark(currentId.toInt())
-            "Автомобили" -> getCar(currentId.toInt())
-            "Должности" -> getJob(currentId.toInt())
-            "Сотрудники" -> getEmployee(currentId.toInt())
-            "Точки назначения" -> getDestinationPoint(currentId.toInt())
-            "Клиенты" -> getCustomer(currentId.toInt())
-            "Классификация грузов" -> getCargoClass(currentId.toInt())
-            "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
-            "Договор" -> getContract(currentId.toInt())
-            "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
-            else -> getCargo(currentId.toInt())
-        }
-    }
-
-    if (dialogWindow) {
-        AlertDialog(
-            onDismissRequest = { dialogWindow = false },
-            title = { Text(text = "Подтвердите действие") },
-            text = { Text("Сохранить данные") },
-            buttons = {
-                Row(
-                    Modifier.padding(25.dp)
-                ) {
-                    Button(onClick = {
-                        dialogWindow = false
-                        when (table){
-                            "Контактные лица" -> updateContact(data)
-                            "Автопарки" -> updateAutopark(data)
-                            "Автомобили" -> updateCar(data)
-                            "Должности" -> updateJob(data)
-                            "Сотрудники" -> updateEmployee(data)
-                            "Точки назначения" -> updateDestinationPoint(data)
-                            "Клиенты" -> updateCustomer(data)
-                            "Классификация грузов" -> updateCargoClass(data)
-                            "Дополнительные услуги" -> updateAdditionalService(data)
-                            "Договор" -> updateContract(data)
-                            "Договор Дополнительные услуги" -> updateContractAdditionalService(data)
-                            else -> updateCargo(data)
-                        }
-                        onLogout(currentPagess)
-                    }) {
-                        Text("Сохранить", fontSize = 15.sp)
-                    }
-                    Button(onClick = {
-                        dialogWindow = false
-                    }) {
-                        Text("Отменить", fontSize = 15.sp)
-                    }
-                }
-            }
-        )
-    }
-
-    MainScaffold(
-        title = title,
-        onLogout = onLogout
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Text("Изменить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-
-            Column(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
-            ) {
-                if (data.size > head.size) {
-                    for (i in head.indices) {
-                        OutlinedTextField(
-                            value = data[i], // Accessing data[i+1] safely
-                            onValueChange = { newData ->
-                                data = data.toMutableList().also { it[i] = newData }
-                            },
-                            label = { Text(head[i]) }
-                        )
-                    }
-                }
-
-                Button(onClick = {dialogWindow = true
-                }){
-                    Text("Сохранить")
-                }
-            }
-        }
-    }
-}

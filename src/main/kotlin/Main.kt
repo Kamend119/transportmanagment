@@ -10,6 +10,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.text.style.TextAlign
@@ -48,10 +51,7 @@ fun App() {
                 currentId = userId }, { currentPage = it }, currentId)
             Pages.ManagerMainPage -> ManagerMainPage ({ userId, page ->
                 currentPage = page
-                currentId = userId },
-                { page: Pages, title: String? = null, head: List<String>? = null, table: String? = null ->
-                currentPage = page
-            }
+                currentId = userId }, { currentPage = it }
             )
 
             // водитэл
@@ -63,23 +63,14 @@ fun App() {
             //менеджэр
             Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
             Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
+            Pages.DataManager -> DataManager ({currentPage = it}, { title, head, table, currentPagess, page ->
+                currentTitle = title
+                currentHead = head
+                currentTable = table
+                currentPages = currentPagess
+                currentPage = page
+            })
 
-            Pages.CargosManager -> CargosManager(
-                onLogout = { page -> currentPage = page },
-                onLoginSuccess = { title, head, table, currentIds, currentPagess, page ->
-                    currentTitle = title
-                    currentHead = head
-                    currentTable = table
-                    currentId = currentIds
-                    currentPages = currentPagess
-                    currentPage = page
-                }
-            )
-            Pages.ClassificationManager -> ClassificationManager{ currentPage = it }
-            Pages.AdditionalServicesManager -> AdditionalServicesManager{ currentPage = it }
-            Pages.DestinationPointsManager -> DestinationPointsManager{ currentPage = it }
-            Pages.CustomerManager -> CustomerManager{ currentPage = it }
-            Pages.ContractManager -> ContractManager{ currentPage = it }
 
             //адмэн
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
@@ -173,28 +164,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                 topBar = {
                     TopAppBar(
                         title = { Text(title) },
-                        navigationIcon = {
-                            if (title != "Водитель") {
-                                IconButton(onClick = {
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
-                                }) {
-                                    Icon(Icons.Filled.Menu, contentDescription = null)
-                                }
-                            }
-                        },
                         actions = {
-                            IconButton(onClick = {
-                                when (title) {
-                                    "Водитель" -> onLogout(Pages.DriverMainPage)
-                                    "Администратор" -> onLogout(Pages.AdministratorMainPage)
-                                    "Менеджер" -> onLogout(Pages.ManagerMainPage)
-                                }
-                            }) {
-                                Icon(Icons.Default.Home, contentDescription = "Главная страница")
-                            }
-
                             Box {
                                 IconButton(onClick = { expanded = true }) {
                                     Icon(Icons.Default.AccountCircle, contentDescription = "Показать меню")
@@ -208,9 +178,36 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                             }
                         }
                     )
+                },
+                bottomBar = {
+                    BottomAppBar{
+                        IconButton(onClick = {
+                            when (title) {
+                                "Водитель" -> onLogout(Pages.DriverMainPage)
+                                "Администратор" -> onLogout(Pages.AdministratorMainPage)
+                                "Менеджер" -> onLogout(Pages.ManagerMainPage)
+                            }
+                        }) {
+                            Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                        }
+
+                        Spacer(Modifier.weight(1f, true))
+
+                        IconButton(onClick = {
+                            when (title) {
+                                "Администратор" -> onLogout(Pages.AdministratorMainPage)
+                                "Менеджер" -> onLogout(Pages.DataManager)
+                            }
+                        }) {
+                            Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                        }
+                    }
                 }
             ) {
-                content()
+                innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    content()
+                }
             }
         }
     )
@@ -339,4 +336,234 @@ fun SelectFileDialog(
         return filePath
     }
     return ""
+}
+
+@Composable
+fun TablePage(
+    onLogout: (Pages) -> Unit, titles: String, heads: List<String>, tables: String,
+    onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
+){
+    var data by remember { mutableStateOf(listOf(listOf(""))) }
+    var dialogWindow by remember { mutableStateOf(false) }
+    var confirmation by remember { mutableStateOf(false) }
+    var currentId by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        data = when (tables){
+            "Контактные лица" -> viewContactsInfo()
+            "Автопарки" -> viewAutoparkInfo()
+            "Автомобили" -> viewCarInfo()
+            "Должности" -> viewJobsInfo()
+            "Сотрудники" -> viewEmployeeInfo()
+            "Точки назначения" -> viewDestinationPointsInfo()
+            "Клиенты" -> viewCustomersInfo()
+            "Классификация грузов" -> viewClassCargosInfo()
+            "Дополнительные услуги" -> viewAdditionalServicesInfo()
+            "Договор" -> viewContractInfo()
+            "Договор Дополнительные услуги" -> viewContractAdditionalService()
+            else -> viewCargoInfo()
+        }
+    }
+
+    if (dialogWindow) {
+        AlertDialog(
+            onDismissRequest = { dialogWindow = false },
+            title = { Text(text = "$tables $currentId") },
+            text = { Text("Выберите действие") },
+            buttons = {
+                Column(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        onLoginSuccess(titles, heads, tables, currentId, Pages.TablePage, Pages.UpdatePage)
+                    }) {
+                        Text("Изменить", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        confirmation = true
+                        dialogWindow = false
+                    }) {
+                        Text("Удалить", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
+
+    if (confirmation) {
+        AlertDialog(
+            onDismissRequest = { confirmation = false },
+            title = { Text(text = "Подтвердите действие") },
+            buttons = {
+                Column(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        confirmation = false
+                        when (tables){
+                            "Контактные лица" -> deleteContact(currentId.toInt())
+                            "Автопарки" -> deleteAutopark(currentId.toInt())
+                            "Автомобили" -> deleteCar(currentId.toInt())
+                            "Должности" -> deleteJob(currentId.toInt())
+                            "Сотрудники" -> deleteEmployee(currentId.toInt())
+                            "Точки назначения" -> deleteDestinationPoint(currentId.toInt())
+                            "Клиенты" -> deleteCustomer(currentId.toInt())
+                            "Классификация грузов" -> deleteCargoClass(currentId.toInt())
+                            "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
+                            "Договор" -> deleteContract(currentId.toInt())
+                            "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
+                            else -> deleteCargo(currentId.toInt())
+                        }
+                    }) {
+                        Text("Ок", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        confirmation = false
+                    }) {
+                        Text("Отмена", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
+
+    MainScaffold(
+        title = titles,
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            TableHeader(headers = heads)
+            LazyColumn {
+                items(data.size) { index ->
+                    val row = data[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                            .clickable {
+                                currentId = row[0]
+                                dialogWindow = true
+                            }
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        row.forEach { item ->
+                            TableCell(text = item)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages){
+    var data by remember { mutableStateOf(listOf("")) }
+    var dialogWindow by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        data = when (table){
+            "Контактные лица" -> getContact(currentId.toInt())
+            "Автопарки" -> getAutopark(currentId.toInt())
+            "Автомобили" -> getCar(currentId.toInt())
+            "Должности" -> getJob(currentId.toInt())
+            "Сотрудники" -> getEmployee(currentId.toInt())
+            "Точки назначения" -> getDestinationPoint(currentId.toInt())
+            "Клиенты" -> getCustomer(currentId.toInt())
+            "Классификация грузов" -> getCargoClass(currentId.toInt())
+            "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
+            "Договор" -> getContract(currentId.toInt())
+            "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
+            else -> getCargo(currentId.toInt())
+        }
+    }
+
+    if (dialogWindow) {
+        AlertDialog(
+            onDismissRequest = { dialogWindow = false },
+            title = { Text(text = "Подтвердите действие") },
+            text = { Text("Сохранить данные") },
+            buttons = {
+                Row(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        when (table){
+                            "Контактные лица" -> updateContact(data)
+                            "Автопарки" -> updateAutopark(data)
+                            "Автомобили" -> updateCar(data)
+                            "Должности" -> updateJob(data)
+                            "Сотрудники" -> updateEmployee(data)
+                            "Точки назначения" -> updateDestinationPoint(data)
+                            "Клиенты" -> updateCustomer(data)
+                            "Классификация грузов" -> updateCargoClass(data)
+                            "Дополнительные услуги" -> updateAdditionalService(data)
+                            "Договор" -> updateContract(data)
+                            "Договор Дополнительные услуги" -> updateContractAdditionalService(data)
+                            else -> updateCargo(data)
+                        }
+                        onLogout(currentPagess)
+                    }) {
+                        Text("Сохранить", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                    }) {
+                        Text("Отменить", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
+
+    MainScaffold(
+        title = title,
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Изменить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+            Column(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                for (i in head.indices) {
+                    val value = data.getOrNull(i) ?: ""
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = { newData ->
+                            data = data.toMutableList().also {
+                                if (i < it.size) {
+                                    it[i] = newData
+                                } else {
+                                    it.add(newData)
+                                }
+                            }
+                        },
+                        label = { Text(head[i]) }
+                    )
+                }
+                Button(onClick = {
+                    dialogWindow = true
+                }){
+                    Text("Сохранить")
+                }
+            }
+        }
+    }
 }

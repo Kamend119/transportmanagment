@@ -1,8 +1,6 @@
-import java.math.BigInteger
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.sql.Statement
 import java.time.LocalDate
 
 fun createContact(lastname: String, firstname: String, patronymic: String, phone: String) {
@@ -23,7 +21,7 @@ fun getContact(inId: Int): List<String> {
     var result = listOf<String>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_contacts($inId)")
+            val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_contact($inId)")
             val resultSet: ResultSet = statement.executeQuery()
             if (resultSet.next()) {
                 result = listOf(
@@ -51,11 +49,10 @@ fun updateContact(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteContact(contactId: Long) {
+fun deleteContact(contactId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contact(?)")
-            statement.setLong(1, contactId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contact($contactId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -107,11 +104,10 @@ fun updateAutopark(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteAutopark(autoparkId: Long) {
+fun deleteAutopark(autoparkId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_autopark(?)")
-            statement.setLong(1, autoparkId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_autopark($autoparkId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -166,11 +162,10 @@ fun updateCar(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteCar(carId: Long) {
+fun deleteCar(carId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_car(?)")
-            statement.setLong(1, carId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_car($carId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -193,15 +188,16 @@ fun createAdditionalService(name: String, cost: Float, description: String) {
 }
 fun getAdditionalService(inId: Int): List<String> {
     var result = listOf<String>()
+    println("SELECT * FROM get_autopark($inId)")
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_autopark($inId)")
+            val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_additional_service($inId)")
             val resultSet: ResultSet = statement.executeQuery()
             if (resultSet.next()) {
                 result = listOf(
                     resultSet.getInt("ids").toString(),
                     resultSet.getString("names"),
-                    resultSet.getBigDecimal("costs").toString(),
+                    resultSet.getFloat("costs").toString(),
                     resultSet.getString("descriptions")
                 )
             }
@@ -222,11 +218,10 @@ fun updateAdditionalService(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteAdditionalService(serviceId: Long) {
+fun deleteAdditionalService(serviceId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_additional_service(?)")
-            statement.setLong(1, serviceId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_additional_service($serviceId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -280,11 +275,10 @@ fun updateCustomer(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteCustomer(customerId: Long) {
+fun deleteCustomer(customerId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_customer(?)")
-            statement.setLong(1, customerId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_customer($customerId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -333,11 +327,10 @@ fun updateCargoClass(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteCargoClass(cargoClassId: Long) {
+fun deleteCargoClass(cargoClassId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo_class(?)")
-            statement.setLong(1, cargoClassId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo_class($cargoClassId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -362,7 +355,6 @@ fun createCargo(name: String, weight: Float, volume: Float, contractId: Long, cl
 }
 fun getCargo(inId: Int): List<String> {
     var result = listOf<String>()
-    println("SELECT * FROM get_cargo($inId)")
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_cargo($inId)")
@@ -371,8 +363,8 @@ fun getCargo(inId: Int): List<String> {
                 result = listOf(
                     resultSet.getInt("ids").toString(),
                     resultSet.getString("names"),
-                    resultSet.getBigDecimal("weights").toString(),
-                    resultSet.getBigDecimal("volumes").toString(),
+                    resultSet.getFloat("weights").toString(),
+                    resultSet.getFloat("volumes").toString(),
                     resultSet.getLong("contract_ids").toString(),
                     resultSet.getLong("class_cargos_ids").toString()
                 )
@@ -386,20 +378,26 @@ fun getCargo(inId: Int): List<String> {
 fun updateCargo(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_cargo(${data[0].toInt()}, ${data[1]}, ${data[2].toFloat()}, " +
-                        "${data[3].toFloat()}, ${data[4].toInt()}, ${data[5].toInt()})")
+            val sql = "CALL update_cargo(?, ?, ?, ?, ?, ?)"
+            val statement: PreparedStatement = connection.prepareStatement(sql)
+            statement.setInt(1, data[0].toInt())  // id
+            statement.setString(2, data[1])       // name
+            statement.setFloat(3, data[2].toFloat())  // weight
+            statement.setFloat(4, data[3].toFloat())  // volume
+            statement.setInt(5, data[4].toInt())  // contract_id
+            statement.setInt(6, data[5].toInt())  // class_cargos_id
+            println(statement)
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
     }
 }
-fun deleteCargo(cargoId: Long) {
+
+fun deleteCargo(cargoId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo(?)")
-            statement.setLong(1, cargoId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo($cargoId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -446,11 +444,10 @@ fun updateJob(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteJob(jobId: Long) {
+fun deleteJob(jobId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_job(?)")
-            statement.setLong(1, jobId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_job($jobId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -485,19 +482,16 @@ fun getEmployee(inId: Int): List<String> {
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_employee($inId)")
             val resultSet: ResultSet = statement.executeQuery()
             if (resultSet.next()) {
-                val workdaysArray = resultSet.getArray("workdayss").array as Array<*>
-                val workdaysList = workdaysArray.map { it.toString() }
                 result = listOf(
                     resultSet.getInt("ids").toString(),
                     resultSet.getString("lastnames"),
                     resultSet.getString("firstnames"),
                     resultSet.getString("patronymics"),
-                    resultSet.getObject("date_of_births", LocalDate::class.java).toString(),
+                    resultSet.getString("dateofbirths"),
                     resultSet.getString("phones"),
                     resultSet.getString("passport_datas"),
-                    workdaysList.joinToString(", "),
+                    resultSet.getString("workdayss"),
                     resultSet.getString("logins"),
-                    resultSet.getString("passwords"),
                     resultSet.getLong("job_ids").toString()
                 )
             }
@@ -521,11 +515,10 @@ fun updateEmployee(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteEmployee(employeeId: Long) {
+fun deleteEmployee(employeeId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_employee(?)")
-            statement.setLong(1, employeeId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_employee($employeeId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -554,8 +547,11 @@ fun getDestinationPoint(inId: Int): List<String> {
             if (resultSet.next()) {
                 result = listOf(
                     resultSet.getInt("ids").toString(),
-                    resultSet.getString("names"),
-                    resultSet.getString("addresss")
+                    resultSet.getString("types"),
+                    resultSet.getString("citys"),
+                    resultSet.getString("addresss"),
+                    resultSet.getString("arrivaldates"),
+                    resultSet.getString("statuss")
                 )
             }
         }
@@ -575,11 +571,10 @@ fun updateDestinationPoint(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteDestinationPoint(pointId: Long) {
+fun deleteDestinationPoint(pointId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_destination_point(?)")
-            statement.setLong(1, pointId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_destination_point($pointId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -612,20 +607,15 @@ fun getContract(inId: Int): List<String> {
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_contract($inId)")
             val resultSet: ResultSet = statement.executeQuery()
             if (resultSet.next()) {
-                val additionalServicesArray = resultSet.getArray("additional_servicess").array as Array<*>
-                val additionalServicesList = additionalServicesArray.map { it.toString() }
-                val cargosArray = resultSet.getArray("cargoss").array as Array<*>
-                val cargosList = cargosArray.map { it.toString() }
                 result = listOf(
                     resultSet.getInt("ids").toString(),
-                    resultSet.getString("names"),
-                    resultSet.getObject("date_starts", LocalDate::class.java).toString(),
-                    resultSet.getObject("date_ends", LocalDate::class.java).toString(),
-                    resultSet.getBigDecimal("prices").toString(),
-                    additionalServicesList.joinToString(", "),
-                    cargosList.joinToString(", "),
-                    resultSet.getLong("customer_ids").toString(),
-                    resultSet.getLong("autopark_ids").toString()
+                    resultSet.getString("conclusiondates"),
+                    resultSet.getFloat("costs").toString(),
+                    resultSet.getInt("customer_ids").toString(),
+                    resultSet.getInt("manager_ids").toString(),
+                    resultSet.getInt("driver_ids").toString(),
+                    resultSet.getInt("car_ids").toString(),
+                    resultSet.getInt("destinationpoint_ids").toString()
                 )
             }
         }
@@ -649,11 +639,10 @@ fun updateContract(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteContract(contractId: Long) {
+fun deleteContract(contractId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract(?)")
-            statement.setLong(1, contractId)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract($contractId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -704,11 +693,10 @@ fun updateContractAdditionalService(data: List<String>) {
         e.printStackTrace()
     }
 }
-fun deleteContractAdditionalService(id: Long) {
+fun deleteContractAdditionalService(id: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract_additional_service(?)")
-            statement.setLong(1, id)
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract_additional_service($id)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
