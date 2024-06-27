@@ -353,18 +353,12 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
 
 fun saveToCsv(data: List<List<String>>, contractID: String, filePath: String) {
     val outputFile = File(filePath)
-
     PrintWriter(outputFile).use { out ->
-        // Write header
         out.println("Наименование,Объем,Вес,Описание")
-
-        // Write data
         data.forEach { row ->
             out.println(row.joinToString(","))
         }
     }
-
-    println("CSV file saved successfully to $filePath.")
 }
 
 @Composable
@@ -372,7 +366,6 @@ fun SelectFileDialog(
     onDialogDismiss: (String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             val fileChooser = JFileChooser().apply {
