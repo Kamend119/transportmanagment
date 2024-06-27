@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -215,6 +216,219 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DataAdministrator(onLogout: (Pages) -> Unit,
+                onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
+){
+    MainScaffold(
+        title = "Администратор",
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Данные", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            LazyColumn(
+                Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(30.dp)
+            ) {
+                item {
+                    Text("Контактные лица", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"),
+                                    "Контактные лица",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Автопарки", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Наименование", "Адрес", "ID контактное лицо"),
+                                    "Автопарки",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Автомобили", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Гос. номер", "Модель", "Производитель", "ID автопарка"),
+                                    "Автомобили",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Должности", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Название"),
+                                    "Должности",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Сотрудники", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Дата рождения",
+                                        "Номер телефона", "Паспортные данные", "Рабочие дни",
+                                        "Логин", "ID Должности"),
+                                    "Сотрудники",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Точки назначения", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус"),
+                                    "Точки назначения",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Клиенты", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"),
+                                    "Клиенты",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Дополнительные услуги", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Название", "Стоимость", "Описание"),
+                                    "Дополнительные услуги",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Договоры", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID","Дата заключения","Стоимость","ID клиента",
+                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения", "Статус"),
+                                    "Договоры",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Классификация грузов", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Название", "Описание"),
+                                    "Классификация грузов",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Грузы", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"),
+                                    "Грузы",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Договор Дополнительные услуги", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "ID договора", "ID дополнительной услуги"),
+                                    "Договор Дополнительные услуги",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
+                    Text("Аудит", fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onLoginSuccess(
+                                    "Администратор",
+                                    listOf("ID", "Таблица", "Операция", "Кем", "Дата", "Старые данные", "Новые данные"),
+                                    "Аудит",
+                                    Pages.DataManager,
+                                    Pages.TablePage
+                                )
+                            }
+                            .padding(10.dp)
+                    )
                 }
             }
         }

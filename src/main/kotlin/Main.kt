@@ -76,6 +76,14 @@ fun App() {
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
             Pages.DriverPerformance -> DriverPerformance{ currentPage = it }
             Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
+            Pages.DataAdministrator -> DataAdministrator ({currentPage = it}, { title, head, table, currentPagess, page ->
+                currentTitle = title
+                currentHead = head
+                currentTable = table
+                currentPages = currentPagess
+                currentPage = page
+            })
+
 
             //
             Pages.UpdatePage -> UpdatePage(
@@ -190,25 +198,44 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                 },
                 bottomBar = {
                     BottomAppBar{
-                        IconButton(onClick = {
-                            when (title) {
-                                "Водитель" -> onLogout(Pages.DriverMainPage)
-                                "Администратор" -> onLogout(Pages.AdministratorMainPage)
-                                "Менеджер" -> onLogout(Pages.ManagerMainPage)
+                        Row(
+                            Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            if (title == "Водитель"){
+                                IconButton(onClick = {
+                                    onLogout(Pages.DriverMainPage)
+                                }) {
+                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                                }
                             }
-                        }) {
-                            Icon(Icons.Default.Home, contentDescription = "Главная страница")
-                        }
+                            else if (title == "Менеджер"){
+                                IconButton(onClick = {
+                                    onLogout(Pages.ManagerMainPage)
+                                }) {
+                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                                }
 
-                        Spacer(Modifier.weight(1f, true))
-
-                        IconButton(onClick = {
-                            when (title) {
-                                "Администратор" -> onLogout(Pages.AdministratorMainPage)
-                                "Менеджер" -> onLogout(Pages.DataManager)
+                                IconButton(onClick = {
+                                    onLogout(Pages.DataManager)
+                                }) {
+                                    Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                                }
                             }
-                        }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                            else{
+                                IconButton(onClick = {
+                                    onLogout(Pages.AdministratorMainPage)
+                                }) {
+                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
+                                }
+
+                                IconButton(onClick = {
+                                    onLogout(Pages.DataAdministrator)
+                                }) {
+                                    Icon(Icons.Filled.Settings, contentDescription = "Данные")
+                                }
+                            }
                         }
                     }
                 }
@@ -370,7 +397,7 @@ fun TablePage(
             "Дополнительные услуги" -> viewAdditionalServicesInfo()
             "Договоры" -> viewContractInfo()
             "Договор Дополнительные услуги" -> viewContractAdditionalService()
-            else -> viewCargoInfo()
+            else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
         }
     }
     println(data)
@@ -423,7 +450,7 @@ fun TablePage(
                             "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
                             "Договоры" -> deleteContract(currentId.toInt())
                             "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
-                            else -> deleteCargo(currentId.toInt())
+                            else -> if (titles == "Грузы") deleteCargo(currentId.toInt())
                         }
                     }) {
                         Text("Ок", fontSize = 15.sp)
@@ -503,7 +530,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
             "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
             "Договоры" -> getContract(currentId.toInt())
             "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
-            else -> getCargo(currentId.toInt())
+            else -> if (table == "Грузы") getCargo(currentId.toInt()) else TODO()
         }
     }
 
@@ -530,7 +557,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                             "Дополнительные услуги" -> updateAdditionalService(data)
                             "Договоры" -> updateContract(data)
                             "Договор Дополнительные услуги" -> updateContractAdditionalService(data)
-                            else -> updateCargo(data)
+                            else -> if (table == "Грузы") updateCargo(data)
                         }
                         onLogout(currentPagess)
                     }) {
@@ -700,7 +727,7 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
                         "Дополнительные услуги" -> createAdditionalService(data)
                         "Договоры" -> createContract(data)
                         "Договор Дополнительные услуги" -> createContractAdditionalService(data)
-                        else -> createCargo(data)
+                        else -> if (table == "Грузы") createCargo(data)
                     }
                     onLogout(Pages.TablePage)
                 }) {

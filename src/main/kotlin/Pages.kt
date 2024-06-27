@@ -13,12 +13,15 @@ enum class Pages {
     // менеджэр
     PreliminaryCost,
     AdditionalServicesContract,
+
     DataManager,
 
     //адмэн
     ContractsSummaryForManagers,
     DriverPerformance,
     FillInfoTripManager,
+
+    DataAdministrator,
 
     //
     UpdatePage,
