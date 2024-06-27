@@ -206,7 +206,7 @@ fun ReportsAdministrator(onLogout: (Pages) -> Unit){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Данные", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Text("Отчетность", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
             LazyColumn(
                 Modifier
                     .fillMaxSize(),
