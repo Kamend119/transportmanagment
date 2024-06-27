@@ -23,8 +23,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.FileDialog
 import java.io.File
-import javax.swing.JFileChooser
-import javax.swing.filechooser.FileNameExtensionFilter
 
 @Composable
 @Preview
@@ -50,7 +48,11 @@ fun App() {
                 currentId = userId }, { currentPage = it }, currentId)
             Pages.ManagerMainPage -> ManagerMainPage ({ userId, page ->
                 currentPage = page
-                currentId = userId }, { currentPage = it })
+                currentId = userId },
+                { page: Pages, title: String? = null, head: List<String>? = null, table: String? = null ->
+                currentPage = page
+            }
+            )
 
             // водитэл
             Pages.FillInfoTripDriver -> FillInfoTripDriver({ currentPage = it }, currentId)
@@ -94,6 +96,20 @@ fun App() {
                 currentPages
             )
 
+            Pages.TablePage -> TablePage(
+                onLogout = { page -> currentPage = page },
+                titles = currentTitle,
+                heads = currentHead,
+                tables = currentTable,
+                onLoginSuccess = { title, head, table, currentIds, currentPagess, page ->
+                    currentTitle = title
+                    currentHead = head
+                    currentTable = table
+                    currentId = currentIds
+                    currentPages = currentPagess
+                    currentPage = page
+                }
+            )
         }
     }
 }
@@ -187,7 +203,6 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                                     expanded = expanded,
                                     onDismissRequest = { expanded = false }
                                 ) {
-                                    //Divider()
                                     Text("Выйти", fontSize=15.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
                                 }
                             }

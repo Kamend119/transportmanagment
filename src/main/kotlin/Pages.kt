@@ -26,5 +26,6 @@ enum class Pages {
     FillInfoTripManager,
 
     //
-    UpdatePage
+    UpdatePage,
+    TablePage
 }

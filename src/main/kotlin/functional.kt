@@ -251,14 +251,15 @@ fun viewCargoInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargo_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargos_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("cargo_id").toString(),
-                    resultSet.getString("cargo_name"),
-                    resultSet.getString("cargo_classification_name"),
+                    resultSet.getInt("id").toString(),
+                    resultSet.getString("name"),
                     resultSet.getFloat("weight").toString(),
                     resultSet.getFloat("volume").toString(),
+                    resultSet.getInt("contract_id").toString(),
+                    resultSet.getInt("class_cargos_id").toString()
                 )
                 result.add(row)
             }
@@ -273,11 +274,11 @@ fun viewClassCargosInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM class_cargos_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM class_cargos_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("class_cargo_id").toString(),
-                    resultSet.getString("class_cargo_name"),
+                    resultSet.getInt("id").toString(),
+                    resultSet.getString("name"),
                     resultSet.getString("description")
                 )
                 result.add(row)
@@ -293,11 +294,11 @@ fun viewAdditionalServicesInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM additional_services_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM additionalservices_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("service_id").toString(),
-                    resultSet.getString("service_name"),
+                    resultSet.getInt("id").toString(),
+                    resultSet.getString("name"),
                     resultSet.getFloat("cost").toString(),
                     resultSet.getString("description")
                 )
@@ -314,10 +315,10 @@ fun viewDestinationPointsInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM destination_points_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM destinationpoints_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("destination_point_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("type"),
                     resultSet.getString("sity"),
                     resultSet.getString("address"),
@@ -337,13 +338,13 @@ fun viewCustomersInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM customers_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM customers_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("customer_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname"),
                     resultSet.getString("firstname"),
-                    resultSet.getString("patronymic"),
+                    resultSet.getString("patronymic") ?: "",
                     resultSet.getString("phone")
                 )
                 result.add(row)
@@ -359,20 +360,18 @@ fun viewContractInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contract_info")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("contract_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getDate("conclusiondate").toString(),
                     resultSet.getFloat("cost").toString(),
-                    resultSet.getString("manager_fullname"),
-                    resultSet.getString("driver_fullname"),
-                    resultSet.getString("car_model"),
-                    resultSet.getString("car_brand"),
-                    resultSet.getString("car_licenseplate"),
-                    resultSet.getString("cargo_names"),
-                    resultSet.getString("destination_fulladdress"),
-                    resultSet.getString("additional_services")
+                    resultSet.getInt("customer_id").toString(),
+                    resultSet.getInt("manager_id").toString(),
+                    resultSet.getInt("driver_id").toString(),
+                    resultSet.getInt("car_id").toString(),
+                    resultSet.getInt("destinationpoint_id").toString(),
+                    resultSet.getString("status")
                 )
                 result.add(row)
             }
@@ -388,10 +387,10 @@ fun viewContactsInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contacts_info ORDER BY lastname ASC, firstname ASC")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contacts_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("contact_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname"),
                     resultSet.getString("firstname"),
                     resultSet.getString("patronymic") ?: "",
@@ -410,17 +409,13 @@ fun viewAutoparkInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("""
-                SELECT autopark_id, autopark_name, autopark_address, contact_fullname, contact_phone 
-                FROM autopark_info
-            """.trimIndent())
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM autoparks_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("autopark_id").toString(),
-                    resultSet.getString("autopark_name"),
-                    resultSet.getString("autopark_address"),
-                    resultSet.getString("contact_fullname"),
-                    resultSet.getString("contact_phone")
+                    resultSet.getInt("id").toString(),
+                    resultSet.getString("name"),
+                    resultSet.getString("address"),
+                    resultSet.getString("contact_id")
                 )
                 result.add(row)
             }
@@ -435,18 +430,14 @@ fun viewCarInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("""
-                SELECT car_id, licenseplate, model, brand, autopark_name, autopark_address 
-                FROM car_info
-            """.trimIndent())
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cars_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("car_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("licenseplate"),
                     resultSet.getString("model"),
                     resultSet.getString("brand"),
-                    resultSet.getString("autopark_name"),
-                    resultSet.getString("autopark_address")
+                    resultSet.getInt("autopark_id").toString()
                 )
                 result.add(row)
             }
@@ -461,11 +452,11 @@ fun viewJobsInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM jobs_info ORDER BY job_name ASC")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM jobs_view ORDER BY name ASC")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("job_id").toString(),
-                    resultSet.getString("job_name")
+                    resultSet.getInt("id").toString(),
+                    resultSet.getString("name")
                 )
                 result.add(row)
             }
@@ -480,15 +471,10 @@ fun viewEmployeeInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("""
-                SELECT employee_id, lastname, firstname, patronymic, dateofbirth, phone, 
-                       passport_data, workdays, login, job_name 
-                FROM employee_info
-                ORDER BY lastname ASC, firstname ASC
-            """.trimIndent())
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM employees_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("employee_id").toString(),
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname"),
                     resultSet.getString("firstname"),
                     resultSet.getString("patronymic") ?: "",
@@ -512,11 +498,7 @@ fun viewAuditLogInfo(): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("""
-                SELECT audit_id, table_name, operation, changed_by, 
-                       change_timestamp, old_data, new_data 
-                FROM audit_log_info
-            """.trimIndent())
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM audit_log_view")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("audit_id").toString(),
@@ -526,6 +508,26 @@ fun viewAuditLogInfo(): List<List<String>> {
                     resultSet.getTimestamp("change_timestamp").toString(),
                     resultSet.getString("old_data"),
                     resultSet.getString("new_data")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+fun viewContractAdditionalService(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contract_additionalservices_view")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("id").toString(),
+                    resultSet.getInt("contractid").toString(),
+                    resultSet.getInt("additionalserviceid").toString()
                 )
                 result.add(row)
             }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
+fun ManagerDrawerContent(onLogout: ((page: Pages, title: String?, head: List<String>?, table: String?) -> Unit)? = null, onLoginSuccess: ((page: Pages, title: String, head: List<String>, table: String) -> Unit)? = null){
     LazyColumn {
         item {
             Text(
@@ -42,7 +42,14 @@ fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
             Text("Грузы", fontSize = 18.sp,
                 modifier = Modifier
                     .padding(10.dp)
-                    .clickable { onLogout(Pages.CargosManager) }
+                    .clickable {
+                        onLoginSuccess(
+                            Pages.TablePage,
+                            "Менеджер",
+                            listOf("ID", "Наименование", "Классификация", "Вес", "Объем"),
+                            "Грузы"
+                        )
+                    }
                     .padding(15.dp))
             Text("Классификация грузов", fontSize = 18.sp,
                 modifier = Modifier
@@ -74,8 +81,10 @@ fun ManagerDrawerContent(onLogout: (Pages) -> Unit){
 }
 
 @Composable
-fun ManagerMainPage( onLoginSuccess: (userData: String, page: Pages) -> Unit,
-                     onLogout: (Pages) -> Unit) {
+fun ManagerMainPage(
+    onLoginSuccess: (userData: String, page: Pages) -> Unit,
+    onLogout: () -> Unit
+) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
     var dialogWindow by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
@@ -351,6 +360,66 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
     }
 }
 
+
+@Composable
+fun TablePage(
+    onLogout: (Pages) -> Unit, titles: String, heads: List<String>, tables: String,
+    onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
+){
+    var data by remember { mutableStateOf(listOf(listOf(""))) }
+
+    LaunchedEffect(Unit) {
+        data = when (tables){
+            "Контактные лица" -> viewContactsInfo()
+            "Автопарки" -> viewAutoparkInfo()
+            "Автомобили" -> viewCarInfo()
+            "Должности" -> viewJobsInfo()
+            "Сотрудники" -> viewEmployeeInfo()
+            "Точки назначения" -> viewDestinationPointsInfo()
+            "Клиенты" -> viewCustomersInfo()
+            "Классификация грузов" -> viewClassCargosInfo()
+            "Дополнительные услуги" -> viewAdditionalServicesInfo()
+            "Договор" -> viewContractInfo()
+            "Договор Дополнительные услуги" -> viewContractAdditionalService()
+            else -> viewCargoInfo()
+        }
+    }
+
+    MainScaffold(
+        title = titles,
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            TableHeader(headers = heads)
+            LazyColumn {
+                items(data.size) { index ->
+                    val row = data[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                            .clickable {
+                                onLoginSuccess(titles, heads, tables, row[0], Pages.TablePage, Pages.UpdatePage)
+                            }
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        row.forEach { item ->
+                            TableCell(text = item)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun CargosManager(
@@ -669,7 +738,6 @@ fun ContractManager(onLogout: (Pages) -> Unit) {
         }
     }
 }
-
 
 
 @Composable
