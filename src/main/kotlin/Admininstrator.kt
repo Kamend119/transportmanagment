@@ -110,21 +110,24 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
     var error by remember { mutableStateOf(false) }
 
     if (dialogWindow) {
-        if (error){
+        if (error) {
             AlertDialog(
-                onDismissRequest = { dialogWindow = false
-                    error = false},
+                onDismissRequest = {
+                    dialogWindow = false
+                    error = false
+                },
                 title = { Text(text = "Не верные данные") },
                 text = { Text("Данные не должны быть пустыми!") },
                 confirmButton = {
-                    Button(onClick = { dialogWindow = false
-                        error = false}) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        error = false
+                    }) {
                         Text("OK", fontSize = 22.sp)
                     }
                 }
             )
-        }
-        else {
+        } else {
             AlertDialog(
                 onDismissRequest = { dialogWindow = false },
                 title = { Text(text = "Стоимость грузоперевозки") },
@@ -139,7 +142,7 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
     }
 
     MainScaffold(
-        title = "Администратор",
+        title = "Администратор",  // Ensure that the title is set to "Администратор"
         onLogout = onLogout
     ) {
         Column(
@@ -149,8 +152,11 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Предварительная стоимость грузоперевозки", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-
+            Text(
+                "Предварительная стоимость грузоперевозки",
+                style = MaterialTheme.typography.h6,
+                textAlign = TextAlign.Center
+            )
 
             OutlinedTextField(
                 cityFrom,
@@ -166,13 +172,13 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
 
             OutlinedTextField(
                 weight.toString(),
-                onValueChange = { weight = it.toDouble() },
+                onValueChange = { weight = it.toDoubleOrNull() ?: 0.0 },
                 label = { Text("Вес") }
             )
 
             OutlinedTextField(
                 volume.toString(),
-                onValueChange = { volume = it.toDouble() },
+                onValueChange = { volume = it.toDoubleOrNull() ?: 0.0 },
                 label = { Text("Объем") }
             )
 
@@ -180,17 +186,17 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
                 if (cityTo.isNotEmpty() && cityFrom.isNotEmpty() && weight != 0.0 && volume != 0.0) {
                     data = calculatePreliminaryCost(cityFrom, cityTo, weight, volume)
                     dialogWindow = true
-                }
-                else {
+                } else {
                     dialogWindow = true
                     error = true
                 }
-            }){
-                Text("Расчитать")
+            }) {
+                Text("Рассчитать")
             }
         }
     }
 }
+
 
 @Composable
 fun ReportsAdministrator(onLogout: (Pages) -> Unit){

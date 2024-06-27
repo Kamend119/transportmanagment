@@ -11,10 +11,9 @@ enum class Pages {
     DeclarationDriver,
 
     // менеджэр
-    PreliminaryCost,
     AdditionalServicesContract,
     FillInfoTripManager,
-
+    PreliminaryCostManager,
     DataManager,
 
     //адмэн

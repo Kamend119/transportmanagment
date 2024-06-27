@@ -95,7 +95,7 @@ fun ManagerMainPage(
 }
 
 @Composable
-fun PreliminaryCost(onLogout: (Pages) -> Unit) {
+fun PreliminaryCostManager(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(0.0) }
     var cityFrom by remember { mutableStateOf("") }
     var cityTo by remember { mutableStateOf("") }

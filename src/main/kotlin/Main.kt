@@ -67,7 +67,7 @@ fun App() {
             Pages.DeclarationDriver -> DeclarationDriver({ currentPage = it }, currentId)
 
             //менеджэр
-            Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
+            Pages.PreliminaryCostManager -> PreliminaryCostManager{ currentPage = it }
             Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
             Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
             Pages.DataManager -> DataManager ({currentPage = it}, { title, head, table, currentPagess, page ->
@@ -90,7 +90,7 @@ fun App() {
                 currentPage = page
             })
             Pages.ReportsAdministrator -> ReportsAdministrator{ currentPage = it }
-            Pages.PreliminaryCostAdmin -> PreliminaryCost{ currentPage = it }
+            Pages.PreliminaryCostAdmin -> PreliminaryCostAdmin{ currentPage = it }
             Pages.DeclarationAdministrator -> DeclarationAdministrator({ currentPage = it }, currentId)
 
 
@@ -225,7 +225,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                                 }
 
                                 IconButton(onClick = {
-                                    onLogout(Pages.PreliminaryCost)
+                                    onLogout(Pages.PreliminaryCostManager)
                                 }){
                                     Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
                                 }
