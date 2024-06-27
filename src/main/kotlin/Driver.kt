@@ -186,7 +186,7 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Text("Грузы в договоре №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
             Column(
                 Modifier
                     .fillMaxSize()
@@ -234,7 +234,7 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Декларация №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            Text("Точки назначения в договоре №$contractID", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
             Column(
                 Modifier
                     .fillMaxSize()

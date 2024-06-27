@@ -7,9 +7,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.awt.BorderLayout
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import javax.swing.*
 
 @Composable
 fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: String, page: Pages) -> Unit) {
@@ -222,16 +230,18 @@ fun ReportsAdministrator(onLogout: (Pages) -> Unit){
 
 @Composable
 fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
-    var data by remember {mutableStateOf(listOf(listOf("")))}
-    var start_date by remember { mutableStateOf("") }
-    var end_date by remember { mutableStateOf("") }
+    var data by remember { mutableStateOf(listOf(listOf(""))) }
+    var startDate by remember { mutableStateOf(TextFieldValue("")) }
+    var endDate by remember { mutableStateOf(TextFieldValue("")) }
     var dialogWindow by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     if (dialogWindow) {
         AlertDialog(
             onDismissRequest = { dialogWindow = false },
-            title = { Text(text = "Не верные данные") },
-            text = { Text("Данные не должны быть пустыми!") },
+            title = { Text(text = "Ошибка ввода данных") },
+            text = { Text(dialogMessage) },
             confirmButton = {
                 Button(onClick = { dialogWindow = false }) {
                     Text("OK", fontSize = 22.sp)
@@ -252,28 +262,41 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Row (
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
                     .height(100.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 OutlinedTextField(
-                    start_date,
-                    onValueChange = { start_date = it },
+                    value = startDate,
+                    onValueChange = { startDate = it },
                     label = { Text("Начало периода") }
                 )
 
                 OutlinedTextField(
-                    end_date,
-                    onValueChange = { end_date = it },
+                    value = endDate,
+                    onValueChange = { endDate = it },
                     label = { Text("Конец периода") }
                 )
 
                 Button(onClick = {
-                    if (start_date.isNotEmpty() && end_date.isNotEmpty())
-                        data = contractsSummaryForPeriod(start_date, end_date)
-                    else dialogWindow = true
-                }){
+                    val startDateString = startDate.text
+                    val endDateString = endDate.text
+                    try {
+                        val start = LocalDate.parse(startDateString, dateFormatter)
+                        val end = LocalDate.parse(endDateString, dateFormatter)
+                        if (start.isAfter(end)) {
+                            dialogMessage = "Дата начала не может быть позже даты окончания!"
+                            dialogWindow = true
+                        } else {
+                            data = contractsSummaryForPeriod(startDateString, endDateString)
+                        }
+                    } catch (e: DateTimeParseException) {
+                        dialogMessage = "Введите даты в формате день-месяц-год"
+                        dialogWindow = true
+                    }
+                }) {
                     Text("Расчитать")
                 }
             }
@@ -308,16 +331,18 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
 
 @Composable
 fun DriverPerformance(onLogout: (Pages) -> Unit) {
-    var data by remember {mutableStateOf(listOf(listOf("")))}
-    var start_date by remember { mutableStateOf("") }
-    var end_date by remember { mutableStateOf("") }
+    var data by remember { mutableStateOf(listOf(listOf(""))) }
+    var start_date by remember { mutableStateOf(TextFieldValue("")) }
+    var end_date by remember { mutableStateOf(TextFieldValue("")) }
     var dialogWindow by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     if (dialogWindow) {
         AlertDialog(
             onDismissRequest = { dialogWindow = false },
-            title = { Text(text = "Не верные данные") },
-            text = { Text("Данные не должны быть пустыми!") },
+            title = { Text("Ошибка ввода данных") },
+            text = { Text(dialogMessage) },
             confirmButton = {
                 Button(onClick = { dialogWindow = false }) {
                     Text("OK", fontSize = 22.sp)
@@ -338,28 +363,41 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Row (
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
                     .height(100.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 OutlinedTextField(
-                    start_date,
+                    value = start_date,
                     onValueChange = { start_date = it },
                     label = { Text("Начало периода") }
                 )
 
                 OutlinedTextField(
-                    end_date,
+                    value = end_date,
                     onValueChange = { end_date = it },
                     label = { Text("Конец периода") }
                 )
 
                 Button(onClick = {
-                    if (start_date.isNotEmpty() && end_date.isNotEmpty())
-                        data = driverPerformanceForPeriod(start_date, end_date)
-                    else dialogWindow = true
-                }){
+                    val startDateString = start_date.text
+                    val endDateString = end_date.text
+                    try {
+                        val start = LocalDate.parse(startDateString, dateFormatter)
+                        val end = LocalDate.parse(endDateString, dateFormatter)
+                        if (start.isAfter(end)) {
+                            dialogMessage = "Дата начала не может быть позже даты окончания!"
+                            dialogWindow = true
+                        } else {
+                            data = driverPerformanceForPeriod(startDateString, endDateString)
+                        }
+                    } catch (e: DateTimeParseException) {
+                        dialogMessage = "Введите даты в формате день-месяц-год"
+                        dialogWindow = true
+                    }
+                }) {
                     Text("Расчитать")
                 }
             }

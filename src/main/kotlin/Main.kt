@@ -26,6 +26,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.FileDialog
 import java.io.File
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 @Preview
@@ -491,7 +493,7 @@ fun TablePage(
                 FloatingActionButton(onClick = {
                     onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
                 }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
+                    Icon(Icons.Default.Add, contentDescription = "Добавить")
             }
         }){
             Column(
