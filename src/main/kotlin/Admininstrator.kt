@@ -11,13 +11,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.awt.BorderLayout
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import javax.swing.*
 
 @Composable
 fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: String, page: Pages) -> Unit) {
@@ -196,7 +192,6 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun ReportsAdministrator(onLogout: (Pages) -> Unit){
