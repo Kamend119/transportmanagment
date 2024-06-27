@@ -2,7 +2,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
-// водитэл
+// функции
 fun authorization(login: String, password: String): List<String>? {
     var result: List<String>
     try {
@@ -21,7 +21,7 @@ fun authorization(login: String, password: String): List<String>? {
     }
     return null
 }
-
+// водитэл
 fun getActiveTrip(driverId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -43,7 +43,6 @@ fun getActiveTrip(driverId: String): List<List<String>> {
     }
     return result
 }
-
 fun generateCargoDeclaration(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -65,7 +64,6 @@ fun generateCargoDeclaration(contractId: String): List<List<String>> {
     }
     return result
 }
-
 fun getContractInfo(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -97,7 +95,6 @@ fun getContractInfo(contractId: String): List<List<String>> {
     }
     return result
 }
-
 fun viewCargosInContract(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -120,7 +117,6 @@ fun viewCargosInContract(contractId: String): List<List<String>> {
     }
     return result
 }
-
 fun getContractDestinationPoints(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -144,7 +140,6 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
     }
     return result
 }
-
 // менеджэр
 fun viewActiveContractInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
@@ -167,7 +162,6 @@ fun viewActiveContractInfo(): List<List<String>> {
     }
     return result
 }
-
 fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, volume: Double): Double {
     var preliminaryCost = 0.0
 
@@ -187,7 +181,6 @@ fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, v
 
     return preliminaryCost
 }
-
 fun getAdditionalServices(contract_id: Int): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -208,7 +201,51 @@ fun getAdditionalServices(contract_id: Int): List<List<String>> {
     }
     return result
 }
+//адмэн
+fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period('$start_date', '$end_date')")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("manager_fullname"),
+                    resultSet.getString("contracts_count"),
+                    resultSet.getFloat("total_amount").toString()
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period('$start_date', '$end_date')")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getString("driver_fullname"),
+                    resultSet.getInt("contracts_count").toString(),
+                    resultSet.getInt("hours_on_routes").toString()
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
 
+
+// представления
+// менеджер
 fun viewCargoInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -231,7 +268,6 @@ fun viewCargoInfo(): List<List<String>> {
     }
     return result
 }
-
 fun viewClassCargosInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -252,7 +288,6 @@ fun viewClassCargosInfo(): List<List<String>> {
     }
     return result
 }
-
 fun viewAdditionalServicesInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -274,7 +309,6 @@ fun viewAdditionalServicesInfo(): List<List<String>> {
     }
     return result
 }
-
 fun viewDestinationPointsInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -298,7 +332,6 @@ fun viewDestinationPointsInfo(): List<List<String>> {
     }
     return result
 }
-
 fun viewCustomersInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -321,7 +354,6 @@ fun viewCustomersInfo(): List<List<String>> {
     }
     return result
 }
-
 fun viewContractInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
@@ -350,19 +382,20 @@ fun viewContractInfo(): List<List<String>> {
     }
     return result
 }
-
-//адмэн
-fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<String>> {
+// админ
+fun viewContactsInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period('$start_date', '$end_date')")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contacts_info ORDER BY lastname ASC, firstname ASC")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getString("manager_fullname"),
-                    resultSet.getString("contracts_count"),
-                    resultSet.getFloat("total_amount").toString()
+                    resultSet.getInt("contact_id").toString(),
+                    resultSet.getString("lastname"),
+                    resultSet.getString("firstname"),
+                    resultSet.getString("patronymic") ?: "",
+                    resultSet.getString("phone")
                 )
                 result.add(row)
             }
@@ -372,18 +405,22 @@ fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<S
     }
     return result
 }
-
-fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<String>> {
+fun viewAutoparkInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period('$start_date', '$end_date')")
+            val resultSet: ResultSet = statement.executeQuery("""
+                SELECT autopark_id, autopark_name, autopark_address, contact_fullname, contact_phone 
+                FROM autopark_info
+            """.trimIndent())
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getString("driver_fullname"),
-                    resultSet.getInt("contracts_count").toString(),
-                    resultSet.getInt("hours_on_routes").toString()
+                    resultSet.getInt("autopark_id").toString(),
+                    resultSet.getString("autopark_name"),
+                    resultSet.getString("autopark_address"),
+                    resultSet.getString("contact_fullname"),
+                    resultSet.getString("contact_phone")
                 )
                 result.add(row)
             }
@@ -393,6 +430,108 @@ fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<
     }
     return result
 }
-
-
-// crud
+fun viewCarInfo(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("""
+                SELECT car_id, licenseplate, model, brand, autopark_name, autopark_address 
+                FROM car_info
+            """.trimIndent())
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("car_id").toString(),
+                    resultSet.getString("licenseplate"),
+                    resultSet.getString("model"),
+                    resultSet.getString("brand"),
+                    resultSet.getString("autopark_name"),
+                    resultSet.getString("autopark_address")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+fun viewJobsInfo(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM jobs_info ORDER BY job_name ASC")
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("job_id").toString(),
+                    resultSet.getString("job_name")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+fun viewEmployeeInfo(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("""
+                SELECT employee_id, lastname, firstname, patronymic, dateofbirth, phone, 
+                       passport_data, workdays, login, job_name 
+                FROM employee_info
+                ORDER BY lastname ASC, firstname ASC
+            """.trimIndent())
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("employee_id").toString(),
+                    resultSet.getString("lastname"),
+                    resultSet.getString("firstname"),
+                    resultSet.getString("patronymic") ?: "",
+                    resultSet.getDate("dateofbirth").toString(),
+                    resultSet.getString("phone"),
+                    resultSet.getString("passport_data"),
+                    resultSet.getInt("workdays").toString(),
+                    resultSet.getString("login"),
+                    resultSet.getString("job_name")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}
+fun viewAuditLogInfo(): List<List<String>> {
+    val result = mutableListOf<List<String>>()
+    try {
+        DataBasePostgres.getConnection().use { connection ->
+            val statement: Statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("""
+                SELECT audit_id, table_name, operation, changed_by, 
+                       change_timestamp, old_data, new_data 
+                FROM audit_log_info
+            """.trimIndent())
+            while (resultSet.next()) {
+                val row = listOf(
+                    resultSet.getInt("audit_id").toString(),
+                    resultSet.getString("table_name"),
+                    resultSet.getString("operation"),
+                    resultSet.getString("changed_by"),
+                    resultSet.getTimestamp("change_timestamp").toString(),
+                    resultSet.getString("old_data"),
+                    resultSet.getString("new_data")
+                )
+                result.add(row)
+            }
+        }
+    } catch (e: SQLException) {
+        e.printStackTrace()
+    }
+    return result
+}

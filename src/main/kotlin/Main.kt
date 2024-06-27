@@ -31,7 +31,11 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun App() {
     var currentPage by remember { mutableStateOf(Pages.LoginPage) }
     var currentId by remember { mutableStateOf("") }
+
     var currentTitle by remember { mutableStateOf("") }
+    var currentTable by remember { mutableStateOf("") }
+    var currentHead by remember { mutableStateOf(listOf("")) }
+    var currentPages by remember { mutableStateOf(Pages.LoginPage) }
 
     MaterialTheme {
         when (currentPage) {
@@ -58,7 +62,17 @@ fun App() {
             Pages.PreliminaryCost -> PreliminaryCost{ currentPage = it }
             Pages.AdditionalServicesContract -> AdditionalServicesContract({ currentPage = it }, currentId)
 
-            Pages.CargosManager -> CargosManager{ currentPage = it }
+            Pages.CargosManager -> CargosManager(
+                onLogout = { page -> currentPage = page },
+                onLoginSuccess = { title, head, table, currentIds, currentPagess, page ->
+                    currentTitle = title
+                    currentHead = head
+                    currentTable = table
+                    currentId = currentIds
+                    currentPages = currentPagess
+                    currentPage = page
+                }
+            )
             Pages.ClassificationManager -> ClassificationManager{ currentPage = it }
             Pages.AdditionalServicesManager -> AdditionalServicesManager{ currentPage = it }
             Pages.DestinationPointsManager -> DestinationPointsManager{ currentPage = it }
@@ -69,6 +83,16 @@ fun App() {
             Pages.ContractsSummaryForManagers -> ContractsSummaryForManagers{ currentPage = it }
             Pages.DriverPerformance -> DriverPerformance{ currentPage = it }
             Pages.FillInfoTripManager -> FillInfoTripManager({ currentPage = it }, currentId)
+
+            //
+            Pages.UpdatePage -> UpdatePage(
+                { page -> currentPage = page },
+                currentTitle,
+                currentHead,
+                currentTable,
+                currentId,
+                currentPages
+            )
 
         }
     }

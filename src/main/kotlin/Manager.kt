@@ -353,15 +353,23 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
 
 
 @Composable
-fun CargosManager(onLogout: (Pages) -> Unit){
+fun CargosManager(
+    onLogout: (Pages) -> Unit,
+    onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
+) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
+    val table = "Грузы"
+    val head = listOf(
+        "ID", "Наименование", "Классификация", "Вес", "Объем"
+    )
+    val title = "Менеджер"
 
     LaunchedEffect(Unit) {
         data = viewCargoInfo()
     }
 
     MainScaffold(
-        title = "Менеджер",
+        title = title,
         onLogout = onLogout
     ) {
         Column(
@@ -371,21 +379,22 @@ fun CargosManager(onLogout: (Pages) -> Unit){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text("Грузы", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            TableHeader(headers = listOf(
-                "ID", "Наименование", "Классификация", "Вес", "Объем"
-            ))
+            Text(table, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+            TableHeader(headers = head)
             LazyColumn {
                 items(data.size) { index ->
-                    val trip = data[index]
+                    val cargo = data[index]
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Transparent)
+                            .clickable {
+                                onLoginSuccess(title, head, table, cargo[0], Pages.CargosManager, Pages.UpdatePage)
+                            }
                             .padding(8.dp),
                         horizontalArrangement = Arrangement.SpaceAround
-                    )  {
-                        trip.forEach { item ->
+                    ) {
+                        cargo.forEach { item ->
                             TableCell(text = item)
                         }
                     }
@@ -655,6 +664,106 @@ fun ContractManager(onLogout: (Pages) -> Unit) {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages){
+    var data by remember { mutableStateOf(listOf("")) }
+    var dialogWindow by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        data = when (table){
+            "Контактные лица" -> getContact(currentId.toInt())
+            "Автопарки" -> getAutopark(currentId.toInt())
+            "Автомобили" -> getCar(currentId.toInt())
+            "Должности" -> getJob(currentId.toInt())
+            "Сотрудники" -> getEmployee(currentId.toInt())
+            "Точки назначения" -> getDestinationPoint(currentId.toInt())
+            "Клиенты" -> getCustomer(currentId.toInt())
+            "Классификация грузов" -> getCargoClass(currentId.toInt())
+            "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
+            "Договор" -> getContract(currentId.toInt())
+            "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
+            else -> getCargo(currentId.toInt())
+        }
+    }
+
+    if (dialogWindow) {
+        AlertDialog(
+            onDismissRequest = { dialogWindow = false },
+            title = { Text(text = "Подтвердите действие") },
+            text = { Text("Сохранить данные") },
+            buttons = {
+                Row(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        when (table){
+                            "Контактные лица" -> updateContact(data)
+                            "Автопарки" -> updateAutopark(data)
+                            "Автомобили" -> updateCar(data)
+                            "Должности" -> updateJob(data)
+                            "Сотрудники" -> updateEmployee(data)
+                            "Точки назначения" -> updateDestinationPoint(data)
+                            "Клиенты" -> updateCustomer(data)
+                            "Классификация грузов" -> updateCargoClass(data)
+                            "Дополнительные услуги" -> updateAdditionalService(data)
+                            "Договор" -> updateContract(data)
+                            "Договор Дополнительные услуги" -> updateContractAdditionalService(data)
+                            else -> updateCargo(data)
+                        }
+                        onLogout(currentPagess)
+                    }) {
+                        Text("Сохранить", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                    }) {
+                        Text("Отменить", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
+
+    MainScaffold(
+        title = title,
+        onLogout = onLogout
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Text("Изменить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+            Column(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                if (data.size > head.size) {
+                    for (i in head.indices) {
+                        OutlinedTextField(
+                            value = data[i], // Accessing data[i+1] safely
+                            onValueChange = { newData ->
+                                data = data.toMutableList().also { it[i] = newData }
+                            },
+                            label = { Text(head[i]) }
+                        )
+                    }
+                }
+
+                Button(onClick = {dialogWindow = true
+                }){
+                    Text("Сохранить")
                 }
             }
         }

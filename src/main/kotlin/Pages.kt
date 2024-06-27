@@ -23,5 +23,8 @@ enum class Pages {
     //адмэн
     ContractsSummaryForManagers,
     DriverPerformance,
-    FillInfoTripManager
+    FillInfoTripManager,
+
+    //
+    UpdatePage
 }
