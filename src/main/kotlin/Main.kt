@@ -471,11 +471,13 @@ fun TablePage(
     ) {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
-                }) {
-                    Icon(Icons.Default.Add, contentDescription = "Добавить")
-            }
+                if (tables != "Аудит"){
+                    FloatingActionButton(onClick = {
+                        onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
+                    }) {
+                        Icon(Icons.Default.Add, contentDescription = "Добавить")
+                    }
+                }
         }){
             Column(
                 Modifier
@@ -494,8 +496,10 @@ fun TablePage(
                                 .fillMaxWidth()
                                 .background(Color.Transparent)
                                 .clickable {
-                                    currentId = row[0]
-                                    dialogWindow = true
+                                    if (tables != "Аудит"){
+                                        currentId = row[0]
+                                        dialogWindow = true
+                                    }
                                 }
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceAround
