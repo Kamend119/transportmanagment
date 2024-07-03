@@ -501,7 +501,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"),
                                     "Контактные лица",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -515,7 +515,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Наименование", "Адрес", "ID контактное лицо"),
                                     "Автопарки",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -529,7 +529,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Гос. номер", "Модель", "Производитель", "ID автопарка"),
                                     "Автомобили",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -543,7 +543,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Название"),
                                     "Должности",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -559,7 +559,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                         "Номер телефона", "Паспортные данные", "Рабочие дни",
                                         "Логин", "ID Должности"),
                                     "Сотрудники",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -571,9 +571,9 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                             .clickable {
                                 onLoginSuccess(
                                     "Администратор",
-                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус"),
+                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"),
                                     "Точки назначения",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -587,7 +587,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"),
                                     "Клиенты",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -601,7 +601,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Название", "Стоимость", "Описание"),
                                     "Дополнительные услуги",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -616,7 +616,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     listOf("ID","Дата заключения","Стоимость","ID клиента",
                                         "ID менеджера","ID водителя","ID автомобиля","ID точки назначения", "Статус"),
                                     "Договоры",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -630,7 +630,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Название", "Описание"),
                                     "Классификация грузов",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -644,7 +644,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"),
                                     "Грузы",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -658,7 +658,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "ID договора", "ID дополнительной услуги"),
                                     "Договор Дополнительные услуги",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
@@ -672,7 +672,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                     "Администратор",
                                     listOf("ID", "Таблица", "Операция", "Кем", "Дата", "Старые данные", "Новые данные"),
                                     "Аудит",
-                                    Pages.DataManager,
+                                    Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }

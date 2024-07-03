@@ -489,7 +489,7 @@ fun viewEmployeeInfo(): List<List<String>> {
                     resultSet.getString("passport_data")?: "",
                     resultSet.getInt("workdays").toString()?: "",
                     resultSet.getString("login")?: "",
-                    resultSet.getString("job_name")?: ""
+                    resultSet.getLong("job_id").toString()?: ""
                 )
                 result.add(row)
             }

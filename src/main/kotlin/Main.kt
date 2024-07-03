@@ -515,24 +515,33 @@ fun TablePage(
 @Composable
 fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages){
     var data by remember { mutableStateOf(listOf("")) }
+    var inDay by remember { mutableStateOf(listOf("")) }
+    var pasport by remember { mutableStateOf(listOf("")) }
     var dialogWindow by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        data = when (table){
-            "Контактные лица" -> getContact(currentId.toInt())
-            "Автопарки" -> getAutopark(currentId.toInt())
-            "Автомобили" -> getCar(currentId.toInt())
-            "Должности" -> getJob(currentId.toInt())
-            "Сотрудники" -> getEmployee(currentId.toInt())
-            "Точки назначения" -> getDestinationPoint(currentId.toInt())
-            "Клиенты" -> getCustomer(currentId.toInt())
-            "Классификация грузов" -> getCargoClass(currentId.toInt())
-            "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
-            "Договоры" -> getContract(currentId.toInt())
-            "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
-            else -> if (table == "Грузы") getCargo(currentId.toInt()) else TODO()
+        LaunchedEffect(Unit) {
+            if (table != "Сотрудники"){
+                data = when (table){
+                    "Контактные лица" -> getContact(currentId.toInt())
+                    "Автопарки" -> getAutopark(currentId.toInt())
+                    "Автомобили" -> getCar(currentId.toInt())
+                    "Должности" -> getJob(currentId.toInt())
+                    "Точки назначения" -> getDestinationPoint(currentId.toInt())
+                    "Клиенты" -> getCustomer(currentId.toInt())
+                    "Классификация грузов" -> getCargoClass(currentId.toInt())
+                    "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
+                    "Договоры" -> getContract(currentId.toInt())
+                    "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
+                    else -> if (table == "Грузы") getCargo(currentId.toInt()) else TODO()
+                }
+            }
+            else {
+                val (genData, passData, workData) = getEmployee(currentId.toInt())
+                data = genData
+                pasport = passData
+                inDay = workData
+            }
         }
-    }
 
     if (dialogWindow) {
         AlertDialog(
@@ -550,7 +559,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                             "Автопарки" -> updateAutopark(data)
                             "Автомобили" -> updateCar(data)
                             "Должности" -> updateJob(data)
-                            "Сотрудники" -> updateEmployee(data)
+                            "Сотрудники" -> updateEmployee(data, inDay, pasport)
                             "Точки назначения" -> updateDestinationPoint(data)
                             "Клиенты" -> updateCustomer(data)
                             "Классификация грузов" -> updateCargoClass(data)
@@ -590,24 +599,67 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                 modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
                 for (i in head.indices) {
-                    val value = data.getOrNull(i) ?: ""
-                    OutlinedTextField(
-                        value = value,
-                        onValueChange = { newData ->
-                            data = data.toMutableList().also {
-                                if (i < it.size) {
-                                    it[i] = newData
-                                } else {
-                                    it.add(newData)
+                    if (table != "Сотрудники" && head[i] != "Паспортные данные" && head[i] != "Рабочие дни") {
+                        val value = data.getOrNull(i) ?: ""
+                        OutlinedTextField(
+                            value = value,
+                            onValueChange = { newData ->
+                                data = data.toMutableList().also {
+                                    if (i < it.size) {
+                                        it[i] = newData
+                                    } else {
+                                        it.add(newData)
+                                    }
                                 }
+                            },
+                            label = { Text(head[i]) }
+                        )
+                    } else if (table == "Сотрудники" && head[i] == "Паспортные данные") {
+                        Text("Паспортные данные")
+                        val labels = arrayOf("Серия", "Номер", "Кем выдан", "Когда выдан")
+                        for (j in labels.indices) {
+                            val value = pasport.getOrNull(j) ?: ""
+                            OutlinedTextField(
+                                value = value,
+                                onValueChange = { newData ->
+                                    pasport = pasport.toMutableList().also {
+                                        if (j < it.size) {
+                                            it[j] = newData
+                                        } else {
+                                            it.add(newData)
+                                        }
+                                    }
+                                },
+                                label = { Text(labels[j]) }
+                            )
+                        }
+                    } else if (table == "Сотрудники" && head[i] == "Рабочие дни") {
+                        Text("Рабочие дни")
+                        val labels = arrayOf("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
+                        val checkedState = remember { mutableStateOf(BooleanArray(labels.size) { false }) }
+                        inDay.forEachIndexed { index, day ->
+                            checkedState.value[index] = inDay.contains(labels[index])
+                        }
+
+                        labels.forEachIndexed { index, label ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = checkedState.value[index],
+                                    onCheckedChange = { isChecked ->
+                                        checkedState.value[index] = isChecked
+                                        inDay = checkedState.value.mapIndexed { i, checked ->
+                                            if (checked) labels[i] else null
+                                        }.filterNotNull()
+                                    }
+                                )
+                                Text(label)
                             }
-                        },
-                        label = { Text(head[i]) }
-                    )
+                        }
+                    }
                 }
-                Button(onClick = {
-                    dialogWindow = true
-                }){
+                Button(onClick = { dialogWindow = true }) {
                     Text("Сохранить")
                 }
             }

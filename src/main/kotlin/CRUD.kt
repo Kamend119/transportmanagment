@@ -448,47 +448,44 @@ fun createEmployee(data: List<String>, inDay: List<String>, pasport: List<String
         e.printStackTrace()
     }
 }
-fun getEmployee(inId: Int): List<String> {
-    var result = listOf<String>()
+fun getEmployee(inId: Int): Triple<List<String>, List<String>, List<String>> {
+    var generalData = listOf<String>()
+    var passportData = listOf<String>()
+    var workDays = listOf<String>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_employee($inId)")
             val resultSet: ResultSet = statement.executeQuery()
             if (resultSet.next()) {
-                result = listOf(
+                generalData = listOf(
                     resultSet.getInt("ids").toString(),
                     resultSet.getString("lastnames"),
                     resultSet.getString("firstnames"),
                     resultSet.getString("patronymics"),
                     resultSet.getString("dateofbirths"),
                     resultSet.getString("phones"),
-                    resultSet.getString("passport_datas"),
-                    resultSet.getString("workdayss"),
                     resultSet.getString("logins"),
-                    resultSet.getLong("job_ids").toString()
+                    resultSet.getInt("job_ids").toString()
                 )
+
+                passportData = resultSet.getString("passport_datas").split(",")
+                workDays = resultSet.getString("workdayss").split(",")
             }
         }
     } catch (e: SQLException) {
         e.printStackTrace()
     }
-    return result
+
+    return Triple(generalData, passportData, workDays)
 }
-fun updateEmployee(data: List<String>, inDay: List<String>, pasport: List<String>) {
+fun updateEmployee(generalData: List<String>, workDays: List<String>, passportData: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val pasportData = "'{\"series\": \"${pasport[0]}\", \"number\": \"${pasport[1]}\", \"issued_by\": \"${pasport[3]}\", \"issued_date\": \"${pasport[4]}\"}'"
-            var day = "'{"
-            for (i in inDay){
-                day += " '$i',"
-            }
-            day.dropLast(1)
-            day += "}'"
+            val passportJson = "'{\"series\": \"${passportData[0]}\", \"number\": \"${passportData[1]}\", \"issued_by\": \"${passportData[2]}\", \"issued_date\": \"${passportData[3]}\"}'"
+            val workDaysArray = workDays.joinToString(prefix = "'{", postfix = "}'", separator = ", ")
 
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_employee(${data[0].toInt()}, '${data[1]}', '${data[2]}', '${data[3]}', " +
-                        "'${data[4]}', '${data[5]}', $pasportData, " +
-                        "$day, '${data[6]}', '${data[7]}', ${data[8].toInt()})")
+                connection.prepareStatement("CALL update_employee(${generalData[0].toInt()}, '${generalData[1]}', '${generalData[2]}', '${generalData[3]}', '${generalData[4]}', '${generalData[5]}', $passportJson, $workDaysArray, '${generalData[6]}', ${generalData[7].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
