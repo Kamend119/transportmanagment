@@ -327,7 +327,7 @@ fun viewDestinationPointsInfo(): List<List<String>> {
                 val row = listOf(
                     resultSet.getInt("id").toString()?: "",
                     resultSet.getString("type")?: "",
-                    resultSet.getString("sity")?: "",
+                    resultSet.getString("city")?: "",
                     resultSet.getString("address")?: "",
                     resultSet.getDate("arrivaldate").toString()?: "",
                     resultSet.getString("status")?: ""
