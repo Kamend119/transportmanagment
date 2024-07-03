@@ -38,7 +38,7 @@ fun updateContact(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("CALL update_contact(${data[0].toInt()}, " +
-                    "${data[1]}, ${data[2]}, ${data[3]}, ${data[4]})")
+                    "'${data[1]}', '${data[2]}', '${data[3]}', '${data[4]}')")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -91,7 +91,7 @@ fun updateAutopark(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-            connection.prepareStatement("CALL update_autopark(${data[0].toInt()}, ${data[1]}, ${data[2]}, ${data[3].toInt()})")
+            connection.prepareStatement("CALL update_autopark(${data[0].toInt()}, '${data[1]}', '${data[2]}', ${data[3].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -146,7 +146,7 @@ fun updateCar(data: List<String>) {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
                 connection.prepareStatement("CALL update_car(${data[0].toInt()}, " +
-                        "${data[1]}, ${data[2]}, ${data[3]}, ${data[4].toInt()})")
+                        "'${data[1]}', '${data[2]}', '${data[3]}', ${data[4].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -177,7 +177,6 @@ fun createAdditionalService(data: List<String>) {
 }
 fun getAdditionalService(inId: Int): List<String> {
     var result = listOf<String>()
-    println("SELECT * FROM get_autopark($inId)")
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_additional_service($inId)")
@@ -200,7 +199,7 @@ fun updateAdditionalService(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_additional_service(${data[0].toInt()}, ${data[1]}, ${data[2].toFloat()}, ${data[3]})")
+                connection.prepareStatement("CALL update_additional_service(${data[0].toInt()}, '${data[1]}', ${data[2].toFloat()}, '${data[3]}')")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -254,7 +253,7 @@ fun updateCustomer(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_customer(${data[0].toInt()}, ${data[1]}, ${data[2]}, ${data[3]}, ${data[4]})")
+                connection.prepareStatement("CALL update_customer(${data[0].toInt()}, '${data[1]}', '${data[2]}', '${data[3]}', '${data[4]}')")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -475,14 +474,21 @@ fun getEmployee(inId: Int): List<String> {
     }
     return result
 }
-fun updateEmployee(data: List<String>) {
+fun updateEmployee(data: List<String>, inDay: List<String>, pasport: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
+            val pasportData = "'{\"series\": \"${pasport[0]}\", \"number\": \"${pasport[1]}\", \"issued_by\": \"${pasport[3]}\", \"issued_date\": \"${pasport[4]}\"}'"
+            var day = "'{"
+            for (i in inDay){
+                day += " '$i',"
+            }
+            day.dropLast(1)
+            day += "}'"
+
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_employee(${data[0].toInt()}, '${data[1]}', " +
-                        "'${data[2]}', '${data[3]}', '${data[4]}', '${data[5]}', '${data[6]}', " +
-                        "${connection.createArrayOf("text", arrayOf(data[7]))}, " +
-                        "'${data[8]}', '${data[9]}', ${data[10].toInt()})")
+                connection.prepareStatement("CALL update_employee(${data[0].toInt()}, '${data[1]}', '${data[2]}', '${data[3]}', " +
+                        "'${data[4]}', '${data[5]}', $pasportData, " +
+                        "$day, '${data[6]}', '${data[7]}', ${data[8].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -503,7 +509,9 @@ fun deleteEmployee(employeeId: Int) {
 fun createDestinationPoint(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("CALL create_destination_point('${data[0]}', '${data[1]}')")
+            val statement: PreparedStatement =
+                connection.prepareStatement("CALL create_destinationpoint('${data[0]}', '${data[1]}', '${data[2]}', " +
+                        "'${data[3]}', '${data[4]}', ${data[5].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -537,7 +545,8 @@ fun updateDestinationPoint(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_destination_point(${data[0].toInt()}, '${data[1]}', '${data[2]}')")
+                connection.prepareStatement("CALL update_destinationpoint(${data[0].toInt()}, '${data[1]}', '${data[2]}', '${data[3]}', " +
+                        "                        '${data[4]}', '${data[5]}', ${data[6].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -596,10 +605,7 @@ fun updateContract(data: List<String>) {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
                 connection.prepareStatement("CALL update_contract(${data[0].toInt()}, '${data[1]}', " +
-                        "'${data[2]}', '${data[3]}', ${data[4].toFloat()}, " +
-                        "${connection.createArrayOf("bigint", arrayOf(data[5]))}, " +
-                        "${connection.createArrayOf("bigint", arrayOf(data[6]))}, " +
-                        "${data[7].toInt()}, ${data[8].toInt()})")
+                        "${data[2].toInt()}, ${data[3].toInt()}, ${data[4].toInt()}, ${data[5].toInt()}")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
