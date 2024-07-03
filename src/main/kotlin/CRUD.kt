@@ -1,7 +1,6 @@
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.time.LocalDate
 
 fun createContact(data: List<String>) {
     try {
@@ -524,7 +523,8 @@ fun getDestinationPoint(inId: Int): List<String> {
                     resultSet.getString("citys"),
                     resultSet.getString("addresss"),
                     resultSet.getString("arrivaldates"),
-                    resultSet.getString("statuss")
+                    resultSet.getString("statuss"),
+                    resultSet.getInt("contract_ids").toString()
                 )
             }
         }
@@ -547,7 +547,7 @@ fun updateDestinationPoint(data: List<String>) {
 fun deleteDestinationPoint(pointId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_destination_point($pointId)")
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_destinationpoint($pointId)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -559,9 +559,9 @@ fun createContract(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL create_contract('${data[0]}', '${data[1]}', '${data[2]}', " +
-                        "${data[3].toFloat()}, ${data[4].toInt()}, ${data[5].toInt()}, " +
-                        "${data[6].toInt()}, ${data[7].toInt()})")
+                connection.prepareStatement("CALL create_contract('${data[0]}', " +
+                        "${data[1].toInt()}, ${data[2].toInt()}, ${data[3].toInt()}, " +
+                        "${data[4].toInt()}")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -582,8 +582,7 @@ fun getContract(inId: Int): List<String> {
                     resultSet.getInt("customer_ids").toString(),
                     resultSet.getInt("manager_ids").toString(),
                     resultSet.getInt("driver_ids").toString(),
-                    resultSet.getInt("car_ids").toString(),
-                    resultSet.getInt("destinationpoint_ids").toString()
+                    resultSet.getInt("car_ids").toString()
                 )
             }
         }

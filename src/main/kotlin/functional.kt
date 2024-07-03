@@ -70,7 +70,7 @@ fun getContractInfo(contractId: String): List<List<String>> {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_info($contractId)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contracts_info($contractId)")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getInt("contracts_id").toString()?: "",
@@ -82,10 +82,7 @@ fun getContractInfo(contractId: String): List<List<String>> {
                     resultSet.getString("car_licenseplate")?: "",
                     resultSet.getString("car_model")?: "",
                     resultSet.getString("car_brand")?: "",
-                    resultSet.getString("destinationpoint_type")?: "",
-                    resultSet.getString("destinationpoint_city")?: "",
-                    resultSet.getString("destinationpoint_address")?: "",
-                    resultSet.getDate("destinationpoint_arrival_date").toString()?: "",
+                    resultSet.getString("destinationpoints_info")?: "",
                     resultSet.getString("additional_services")?: ""
                 )
                 result.add(row)
@@ -154,7 +151,6 @@ fun updateStatusDestinationPoints(contractId: String, status: String) {
         e.printStackTrace()
     }
 }
-
 // менеджэр
 fun viewActiveContractInfo(): List<List<String>> {
     val result = mutableListOf<List<String>>()
@@ -193,12 +189,12 @@ fun calculatePreliminaryCost(cityFrom: String, cityTo: String, weight: Double, v
 
     return preliminaryCost
 }
-fun getAdditionalServices(contract_id: Int): List<List<String>> {
+fun getAdditionalServices(contractId: Int): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_additional_services($contract_id)")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_additional_services($contractId)")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("name"),
@@ -214,12 +210,12 @@ fun getAdditionalServices(contract_id: Int): List<List<String>> {
     return result
 }
 //адмэн
-fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<String>> {
+fun contractsSummaryForPeriod(startDate: String, endDate: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period('$start_date', '$end_date')")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_summary_for_period('$startDate', '$endDate')")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("manager_fullname")?: "",
@@ -234,12 +230,12 @@ fun contractsSummaryForPeriod(start_date: String, end_date: String): List<List<S
     }
     return result
 }
-fun driverPerformanceForPeriod(start_date: String, end_date: String): List<List<String>> {
+fun driverPerformanceForPeriod(startDate: String, endDate: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: Statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period('$start_date', '$end_date')")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM driver_performance_for_period('$startDate', '$endDate')")
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("driver_fullname")?: "",
@@ -381,7 +377,6 @@ fun viewContractInfo(): List<List<String>> {
                     resultSet.getInt("manager_id").toString()?: "",
                     resultSet.getInt("driver_id").toString()?: "",
                     resultSet.getInt("car_id").toString()?: "",
-                    resultSet.getInt("destinationpoint_id").toString()?: "",
                     resultSet.getString("status")?: ""
                 )
                 result.add(row)

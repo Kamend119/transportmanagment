@@ -353,8 +353,8 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
 @Composable
 fun DriverPerformance(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
-    var start_date by remember { mutableStateOf(TextFieldValue("")) }
-    var end_date by remember { mutableStateOf(TextFieldValue("")) }
+    var startDate by remember { mutableStateOf(TextFieldValue("")) }
+    var endDate by remember { mutableStateOf(TextFieldValue("")) }
     var dialogWindow by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
@@ -403,20 +403,20 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = start_date,
-                    onValueChange = { start_date = it },
+                    value = startDate,
+                    onValueChange = { startDate = it },
                     label = { Text("Начало периода") }
                 )
 
                 OutlinedTextField(
-                    value = end_date,
-                    onValueChange = { end_date = it },
+                    value = endDate,
+                    onValueChange = { endDate = it },
                     label = { Text("Конец периода") }
                 )
 
                 Button(onClick = {
-                    val startDateString = start_date.text
-                    val endDateString = end_date.text
+                    val startDateString = startDate.text
+                    val endDateString = endDate.text
                     try {
                         val start = LocalDate.parse(startDateString, dateFormatter)
                         val end = LocalDate.parse(endDateString, dateFormatter)

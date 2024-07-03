@@ -1,5 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -9,10 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.text.style.TextAlign
@@ -22,12 +19,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.rememberDialogState
-import java.awt.FileDialog
 import java.io.File
 import java.io.PrintWriter
 import javax.swing.JFileChooser
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.runtime.Composable
 
 @Composable
 @Preview
@@ -177,101 +175,96 @@ fun TableCell(text: String, isHeader: Boolean = false) {
 
 @Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
     var expanded by remember { mutableStateOf(false) }
 
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerContent = {},
-        content = {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text(title) },
-                        actions = {
-                            Box {
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(Icons.Default.AccountCircle, contentDescription = "Показать меню")
-                                }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    Text("Выйти", fontSize=15.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
-                                }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(title) },
+                actions = {
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.AccountCircle, contentDescription = "Показать меню")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            Text("Выйти", fontSize=15.sp, modifier = Modifier.padding(10.dp) .clickable { onLogout(Pages.LoginPage) } .padding(15.dp))
+                        }
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar{
+                Row(
+                    Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    when (title) {
+                        "Водитель" -> {
+                            IconButton(onClick = {
+                                onLogout(Pages.DriverMainPage)
+                            }) {
+                                Icon(Icons.Default.Home, "Главная страница")
                             }
                         }
-                    )
-                },
-                bottomBar = {
-                    BottomAppBar{
-                        Row(
-                            Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            if (title == "Водитель"){
-                                IconButton(onClick = {
-                                    onLogout(Pages.DriverMainPage)
-                                }) {
-                                    Icon(Icons.Default.Home, contentDescription = "Главная страница")
-                                }
+                        "Менеджер" -> {
+                            IconButton(onClick = {
+                                onLogout(Pages.ManagerMainPage)
+                            }) {
+                                Icon(Icons.Default.Home, "Главная страница")
                             }
-                            else if (title == "Менеджер"){
-                                IconButton(onClick = {
-                                    onLogout(Pages.ManagerMainPage)
-                                }) {
-                                    Icon(Icons.Default.Home, "Главная страница")
-                                }
 
-                                IconButton(onClick = {
-                                    onLogout(Pages.DataManager)
-                                }) {
-                                    Icon(Icons.Filled.Settings, "Данные")
-                                }
-
-                                IconButton(onClick = {
-                                    onLogout(Pages.PreliminaryCostManager)
-                                }){
-                                    Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
-                                }
+                            IconButton(onClick = {
+                                onLogout(Pages.DataManager)
+                            }) {
+                                Icon(Icons.Filled.Settings, "Данные")
                             }
-                            else{
-                                IconButton(onClick = {
-                                    onLogout(Pages.AdministratorMainPage)
-                                }) {
-                                    Icon(Icons.Default.Home,  "Главная страница")
-                                }
 
-                                IconButton(onClick = {
-                                    onLogout(Pages.DataAdministrator)
-                                }) {
-                                    Icon(Icons.Filled.Settings, "Данные")
-                                }
+                            IconButton(onClick = {
+                                onLogout(Pages.PreliminaryCostManager)
+                            }){
+                                Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
+                            }
+                        }
+                        else -> {
+                            IconButton(onClick = {
+                                onLogout(Pages.AdministratorMainPage)
+                            }) {
+                                Icon(Icons.Default.Home,  "Главная страница")
+                            }
 
-                                IconButton(onClick = {
-                                    onLogout(Pages.PreliminaryCostAdmin)
-                                }){
-                                    Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
-                                }
+                            IconButton(onClick = {
+                                onLogout(Pages.DataAdministrator)
+                            }) {
+                                Icon(Icons.Filled.Settings, "Данные")
+                            }
 
-                                IconButton(onClick = {
-                                    onLogout(Pages.ReportsAdministrator)
-                                }){
-                                    Icon(Icons.Default.Check, "Отчетность")
-                                }
+                            IconButton(onClick = {
+                                onLogout(Pages.PreliminaryCostAdmin)
+                            }){
+                                Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
+                            }
+
+                            IconButton(onClick = {
+                                onLogout(Pages.ReportsAdministrator)
+                            }){
+                                Icon(Icons.Default.Check, "Отчетность")
                             }
                         }
                     }
                 }
-            ) {
-                innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    content()
-                }
             }
         }
-    )
+    ) {
+            innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            content()
+        }
+    }
 }
 
 @Composable
