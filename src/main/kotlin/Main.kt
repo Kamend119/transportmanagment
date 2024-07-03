@@ -672,11 +672,50 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
 }
 
 @Composable
-fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String,
-    currentId: String, currentPagess: Pages ) {
+fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages) {
     var data by remember { mutableStateOf(List(head.size) { "" }) }
     var inDay by remember { mutableStateOf(listOf<String>()) }
     var passport by remember { mutableStateOf(List(4) { "" }) }
+    var dialogWindow by remember { mutableStateOf(false) }
+
+    if (dialogWindow) {
+        AlertDialog(
+            onDismissRequest = { dialogWindow = false },
+            title = { Text(text = "Подтвердите действие") },
+            text = { Text("Добавить данные") },
+            buttons = {
+                Row(
+                    Modifier.padding(25.dp)
+                ) {
+                    Button(onClick = {
+                        dialogWindow = false
+                        when (table) {
+                            "Контактные лица" -> createContact(data)
+                            "Автопарки" -> createAutopark(data)
+                            "Автомобили" -> createCar(data)
+                            "Должности" -> createJob(data)
+                            "Сотрудники" -> createEmployee(data, inDay, passport)
+                            "Точки назначения" -> createDestinationPoint(data)
+                            "Клиенты" -> createCustomer(data)
+                            "Классификация грузов" -> createCargoClass(data)
+                            "Дополнительные услуги" -> createAdditionalService(data)
+                            "Договоры" -> createContract(data)
+                            "Договор Дополнительные услуги" -> createContractAdditionalService(data)
+                            else -> if (table == "Грузы") createCargo(data)
+                        }
+                        onLogout(Pages.TablePage)
+                    }) {
+                        Text("Добавить", fontSize = 15.sp)
+                    }
+                    Button(onClick = {
+                        dialogWindow = false
+                    }) {
+                        Text("Отменить", fontSize = 15.sp)
+                    }
+                }
+            }
+        )
+    }
 
     MainScaffold(
         title = title,
@@ -696,7 +735,7 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
             ) {
                 if (table != "Сотрудники") {
                     head.forEachIndexed { i, label ->
-                        if (head[i] != "ID"){
+                        if (head[i] != "ID") {
                             OutlinedTextField(
                                 value = data[i],
                                 onValueChange = { newData ->
@@ -711,23 +750,21 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
                         if (head[i] != "ID") {
                             when (label) {
                                 "Паспортные данные" -> {
-                                    listOf(
-                                        "Серия",
-                                        "Номер",
-                                        "Когда выдан",
-                                        "Кем выдан"
-                                    ).forEachIndexed { index, passportField ->
+                                    Text("Паспортные данные")
+                                    val passportLabels = listOf("Серия", "Номер", "Кем выдан", "Когда выдан")
+                                    passportLabels.forEachIndexed { j, passportLabel ->
                                         OutlinedTextField(
-                                            value = passport[index],
+                                            value = passport[j],
                                             onValueChange = { newData ->
-                                                passport = passport.toMutableList().also { it[index] = newData }
+                                                passport = passport.toMutableList().also { it[j] = newData }
                                             },
-                                            label = { Text(passportField) }
+                                            label = { Text(passportLabel) }
                                         )
                                     }
                                 }
 
                                 "Рабочие дни" -> {
+                                    Text("Рабочие дни")
                                     val daysOfWeek = listOf(
                                         "Понедельник",
                                         "Вторник",
@@ -771,21 +808,7 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
                 }
 
                 Button(onClick = {
-                    when (table) {
-                        "Контактные лица" -> createContact(data)
-                        "Автопарки" -> createAutopark(data)
-                        "Автомобили" -> createCar(data)
-                        "Должности" -> createJob(data)
-                        "Сотрудники" -> createEmployee(data, inDay, passport)
-                        "Точки назначения" -> createDestinationPoint(data)
-                        "Клиенты" -> createCustomer(data)
-                        "Классификация грузов" -> createCargoClass(data)
-                        "Дополнительные услуги" -> createAdditionalService(data)
-                        "Договоры" -> createContract(data)
-                        "Договор Дополнительные услуги" -> createContractAdditionalService(data)
-                        else -> if (table == "Грузы") createCargo(data)
-                    }
-                    onLogout(Pages.TablePage)
+                    dialogWindow = true
                 }) {
                     Text("Добавить")
                 }
