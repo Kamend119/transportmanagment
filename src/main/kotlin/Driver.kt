@@ -282,8 +282,9 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
         SelectFileDialog(onDialogDismiss = { selectedPath ->
             showDialog = false
             savePath = selectedPath
+            val titles = listOf("Наименование", "Объем", "Вес", "Описание")
             if (savePath.isNotEmpty()) {
-                saveToCsv(declaration, contractID, savePath)
+                saveToCsv(declaration, contractID, savePath, titles)
             }
         })
     }

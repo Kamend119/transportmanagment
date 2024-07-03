@@ -257,8 +257,9 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
         SelectFileDialog(onDialogDismiss = { selectedPath ->
             showDialog = false
             savePath = selectedPath
+            val titles = listOf("ФИО менеджера", "Количество договоров", "Общая сумма")
             if (savePath.isNotEmpty()) {
-                saveToCsv(data, "contracts_summary", savePath)
+                saveToCsv(data, "contracts_summary", savePath, titles)
             }
         })
     }
@@ -378,8 +379,9 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
         SelectFileDialog(onDialogDismiss = { selectedPath ->
             showDialog = false
             savePath = selectedPath
+            val titles = listOf("ФИО водителя", "Количество договоров", "Общее количество часов")
             if (savePath.isNotEmpty()) {
-                saveToCsv(data, "driver_performance", savePath)
+                saveToCsv(data, "driver_performance", savePath, titles)
             }
         })
     }
@@ -688,16 +690,21 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
 fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
     var showDialog by remember { mutableStateOf(false) }
+    var savePath by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         declaration = generateCargoDeclaration(contractID)
     }
 
-    if (showDialog) {
-        val filePath = SelectFileDialog {
+    if (showDialog){
+        SelectFileDialog(onDialogDismiss = { selectedPath ->
             showDialog = false
-        }
-        println(filePath)
+            savePath = selectedPath
+            val titles = listOf("Наименование", "Объем", "Вес", "Описание")
+            if (savePath.isNotEmpty()) {
+                saveToCsv(declaration, "driver_performance", savePath, titles)
+            }
+        })
     }
 
     MainScaffold(
@@ -748,7 +755,6 @@ fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
             Button(
                 onClick = {
                     showDialog = true
-//                    saveToCsv(declaration, contractID)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {

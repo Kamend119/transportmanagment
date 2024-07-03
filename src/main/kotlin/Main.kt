@@ -344,10 +344,10 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     }
 }
 
-fun saveToCsv(data: List<List<String>>, contractID: String, filePath: String) {
+fun saveToCsv(data: List<List<String>>, contractID: String, filePath: String, titles: List<String>) {
     val outputFile = File(filePath)
     PrintWriter(outputFile).use { out ->
-        out.println("Наименование,Объем,Вес,Описание")
+        out.println(titles)
         data.forEach { row ->
             out.println(row.joinToString(","))
         }
