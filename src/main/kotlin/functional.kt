@@ -486,10 +486,10 @@ fun viewEmployeeInfo(): List<List<String>> {
                     resultSet.getString("patronymic") ?: "",
                     resultSet.getDate("dateofbirth").toString()?: "",
                     resultSet.getString("phone")?: "",
+                    resultSet.getString("login")?: "",
+                    resultSet.getLong("job_id").toString()?: "",
                     resultSet.getString("passport_data")?: "",
                     resultSet.getString("workdays")?: "",
-                    resultSet.getString("login")?: "",
-                    resultSet.getLong("job_id").toString()?: ""
                 )
                 result.add(row)
             }

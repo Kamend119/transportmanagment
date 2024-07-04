@@ -1,6 +1,9 @@
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+
 
 fun createContact(data: List<String>) {
     try {
@@ -452,6 +455,9 @@ fun getEmployee(inId: Int): Triple<List<String>, List<String>, List<String>> {
     var generalData = listOf<String>()
     var passportData = listOf<String>()
     var workDays = listOf<String>()
+
+    val mapper = jacksonObjectMapper()
+
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT * FROM get_employee($inId)")
@@ -468,7 +474,16 @@ fun getEmployee(inId: Int): Triple<List<String>, List<String>, List<String>> {
                     resultSet.getInt("job_ids").toString()
                 )
 
-                passportData = resultSet.getString("passport_datas").split(",")
+                // Разбор JSON строки для passportData
+                val passportJson = resultSet.getString("passport_datas")
+                val passportMap: Map<String, String> = mapper.readValue(passportJson)
+                passportData = listOf(
+                    passportMap["series"].orEmpty(),
+                    passportMap["number"].orEmpty(),
+                    passportMap["issued_by"].orEmpty(),
+                    passportMap["issued_date"].orEmpty()
+                )
+
                 workDays = resultSet.getString("workdayss").split(",")
             }
         }
