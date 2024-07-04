@@ -523,29 +523,29 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
     var pasport by remember { mutableStateOf(listOf("")) }
     var dialogWindow by remember { mutableStateOf(false) }
 
-        LaunchedEffect(Unit) {
-            if (table != "Сотрудники"){
-                data = when (table){
-                    "Контактные лица" -> getContact(currentId.toInt())
-                    "Автопарки" -> getAutopark(currentId.toInt())
-                    "Автомобили" -> getCar(currentId.toInt())
-                    "Должности" -> getJob(currentId.toInt())
-                    "Точки назначения" -> getDestinationPoint(currentId.toInt())
-                    "Клиенты" -> getCustomer(currentId.toInt())
-                    "Классификация грузов" -> getCargoClass(currentId.toInt())
-                    "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
-                    "Договоры" -> getContract(currentId.toInt())
-                    "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
-                    else -> if (table == "Грузы") getCargo(currentId.toInt()) else TODO()
-                }
-            }
-            else {
-                val (genData, passData, workData) = getEmployee(currentId.toInt())
-                data = genData
-                pasport = passData
-                inDay = workData
+    LaunchedEffect(Unit) {
+        if (table != "Сотрудники"){
+            data = when (table){
+                "Контактные лица" -> getContact(currentId.toInt())
+                "Автопарки" -> getAutopark(currentId.toInt())
+                "Автомобили" -> getCar(currentId.toInt())
+                "Должности" -> getJob(currentId.toInt())
+                "Точки назначения" -> getDestinationPoint(currentId.toInt())
+                "Клиенты" -> getCustomer(currentId.toInt())
+                "Классификация грузов" -> getCargoClass(currentId.toInt())
+                "Дополнительные услуги" -> getAdditionalService(currentId.toInt())
+                "Договоры" -> getContract(currentId.toInt())
+                "Договор Дополнительные услуги" -> getContractAdditionalService(currentId.toInt())
+                else -> if (table == "Грузы") getCargo(currentId.toInt()) else TODO()
             }
         }
+        else {
+            val (genData, passData, workData) = getEmployee(currentId.toInt())
+            data = genData
+            pasport = passData
+            inDay = workData
+        }
+    }
 
     if (dialogWindow) {
         AlertDialog(
@@ -600,25 +600,10 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
             Text("Изменить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
 
             Column(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+                modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 for (i in head.indices) {
-                    if (table != "Сотрудники" && head[i] != "Паспортные данные" && head[i] != "Рабочие дни") {
-                        val value = data.getOrNull(i) ?: ""
-                        OutlinedTextField(
-                            value = value,
-                            onValueChange = { newData ->
-                                data = data.toMutableList().also {
-                                    if (i < it.size) {
-                                        it[i] = newData
-                                    } else {
-                                        it.add(newData)
-                                    }
-                                }
-                            },
-                            label = { Text(head[i]) }
-                        )
-                    } else if (table == "Сотрудники" && head[i] == "Паспортные данные") {
+                    if (table == "Сотрудники" && head[i] == "Паспортные данные") {
                         Text("Паспортные данные")
                         val labels = arrayOf("Серия", "Номер", "Кем выдан", "Когда выдан")
                         for (j in labels.indices) {
@@ -661,6 +646,21 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                                 Text(label)
                             }
                         }
+                    } else {
+                        val value = data.getOrNull(i) ?: ""
+                        OutlinedTextField(
+                            value = value,
+                            onValueChange = { newData ->
+                                data = data.toMutableList().also {
+                                    if (i < it.size) {
+                                        it[i] = newData
+                                    } else {
+                                        it.add(newData)
+                                    }
+                                }
+                            },
+                            label = { Text(head[i]) }
+                        )
                     }
                 }
                 Button(onClick = { dialogWindow = true }) {
@@ -731,7 +731,7 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
             Text("Добавить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
 
             Column(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+                modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 if (table != "Сотрудники") {
                     head.forEachIndexed { i, label ->
