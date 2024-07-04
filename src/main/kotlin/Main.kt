@@ -603,67 +603,81 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 for (i in head.indices) {
-                    if (table == "Сотрудники" && head[i] == "Паспортные данные") {
-                        Text("Паспортные данные")
-                        val labels = arrayOf("Серия", "Номер", "Кем выдан", "Когда выдан")
-                        for (j in labels.indices) {
-                            val value = pasport.getOrNull(j) ?: ""
+                    if (head[i] != "ID") {
+                        if (table == "Сотрудники" && head[i] == "Паспортные данные") {
+                            Text("Паспортные данные")
+                            val labels = arrayOf("Серия", "Номер", "Кем выдан", "Когда выдан")
+                            for (j in labels.indices) {
+                                val value = pasport.getOrNull(j) ?: ""
+                                OutlinedTextField(
+                                    value = value,
+                                    onValueChange = { newData ->
+                                        pasport = pasport.toMutableList().also {
+                                            if (j < it.size) {
+                                                it[j] = newData
+                                            } else {
+                                                it.add(newData)
+                                            }
+                                        }
+                                    },
+                                    label = { Text(labels[j]) }
+                                )
+                            }
+                        } else if (table == "Сотрудники" && head[i] == "Рабочие дни") {
+                            val labels = arrayOf(
+                                "Понедельник",
+                                "Вторник",
+                                "Среда",
+                                "Четверг",
+                                "Пятница",
+                                "Суббота",
+                                "Воскресенье"
+                            )
+
+// Инициализируем состояние с учетом значений из inDay
+                            val checkedState = remember {
+                                mutableStateOf(labels.map { inDay.contains(it) }.toBooleanArray())
+                            }
+
+                            Text("Рабочие дни")
+
+                            labels.forEachIndexed { index, label ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = checkedState.value[index],
+                                        onCheckedChange = { isChecked ->
+                                            // Обновляем состояние при изменении значения
+                                            val newCheckedState = checkedState.value.copyOf()
+                                            newCheckedState[index] = isChecked
+                                            checkedState.value = newCheckedState
+                                            inDay = labels.filterIndexed { i, _ -> newCheckedState[i] }
+                                        }
+                                    )
+                                    Text(label)
+                                }
+                            }
+                        } else {
+                            val value = data.getOrNull(i) ?: ""
                             OutlinedTextField(
                                 value = value,
                                 onValueChange = { newData ->
-                                    pasport = pasport.toMutableList().also {
-                                        if (j < it.size) {
-                                            it[j] = newData
+                                    data = data.toMutableList().also {
+                                        if (i < it.size) {
+                                            it[i] = newData
                                         } else {
                                             it.add(newData)
                                         }
                                     }
                                 },
-                                label = { Text(labels[j]) }
+                                label = { Text(head[i]) }
                             )
                         }
-                    } else if (table == "Сотрудники" && head[i] == "Рабочие дни") {
-                        Text("Рабочие дни")
-                        val labels = arrayOf("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
-                        val checkedState = remember { mutableStateOf(BooleanArray(labels.size) { false }) }
-                        inDay.forEachIndexed { index, day ->
-                            checkedState.value[index] = inDay.contains(labels[index])
-                        }
-
-                        labels.forEachIndexed { index, label ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = checkedState.value[index],
-                                    onCheckedChange = { isChecked ->
-                                        checkedState.value[index] = isChecked
-                                        inDay = checkedState.value.mapIndexed { i, checked ->
-                                            if (checked) labels[i] else null
-                                        }.filterNotNull()
-                                    }
-                                )
-                                Text(label)
-                            }
-                        }
-                    } else {
-                        val value = data.getOrNull(i) ?: ""
-                        OutlinedTextField(
-                            value = value,
-                            onValueChange = { newData ->
-                                data = data.toMutableList().also {
-                                    if (i < it.size) {
-                                        it[i] = newData
-                                    } else {
-                                        it.add(newData)
-                                    }
-                                }
-                            },
-                            label = { Text(head[i]) }
-                        )
                     }
                 }
-                if (table == "Сотрудники"){
+
+                if (table == "Сотрудники") {
                     OutlinedTextField(
                         value = data.getOrNull(head.size) ?: "",
                         onValueChange = { newData ->
@@ -678,6 +692,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                         label = { Text("Пароль") }
                     )
                 }
+
                 Button(onClick = { dialogWindow = true }) {
                     Text("Сохранить")
                 }
