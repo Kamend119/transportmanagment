@@ -498,9 +498,8 @@ fun updateEmployee(generalData: List<String>, workDays: List<String>, passportDa
         DataBasePostgres.getConnection().use { connection ->
             val passportJson = "'{\"series\": \"${passportData[0]}\", \"number\": \"${passportData[1]}\", \"issued_by\": \"${passportData[2]}\", \"issued_date\": \"${passportData[3]}\"}'"
             val workDaysArray = workDays.joinToString(prefix = "'{", postfix = "}'", separator = ", ")
-
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_employee(${generalData[0].toInt()}, '${generalData[1]}', '${generalData[2]}', '${generalData[3]}', '${generalData[4]}', '${generalData[5]}', $passportJson, $workDaysArray, '${generalData[6]}', ${generalData[7].toInt()})")
+                connection.prepareStatement("CALL update_employee(${generalData[0].toInt()}::int, '${generalData[1]}'::varchar, '${generalData[2]}'::varchar, '${generalData[3]}'::varchar, '${generalData[4]}'::date, '${generalData[5]}'::text, $passportJson::json, $workDaysArray::text[], '${generalData[6]}'::varchar, '${generalData[8]}'::varchar, ${generalData[7].toInt()}::int)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {

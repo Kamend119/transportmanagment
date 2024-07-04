@@ -663,6 +663,21 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                         )
                     }
                 }
+                if (table == "Сотрудники"){
+                    OutlinedTextField(
+                        value = data.getOrNull(head.size) ?: "",
+                        onValueChange = { newData ->
+                            data = data.toMutableList().also {
+                                if (head.size < it.size) {
+                                    it[head.size] = newData
+                                } else {
+                                    it.add(newData)
+                                }
+                            }
+                        },
+                        label = { Text("Пароль") }
+                    )
+                }
                 Button(onClick = { dialogWindow = true }) {
                     Text("Сохранить")
                 }
