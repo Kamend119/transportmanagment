@@ -4,7 +4,6 @@ import java.sql.SQLException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
-
 fun createContact(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->

@@ -26,6 +26,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.loadImageBitmap
+import java.io.InputStream
 
 @Composable
 @Preview
@@ -181,15 +185,20 @@ fun TableCell(text: String, isHeader: Boolean = false) {
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
+    val calculator = remember { loadImageResource("src/main/resources/images/calculator.png") }
+    val databases = remember { loadImageResource("src/main/resources/images/database.png") }
+    val edit = remember { loadImageResource("src/main/resources/images/edit.png") }
+    val home = remember { loadImageResource("src/main/resources/images/home.png") }
+    val users = remember { loadImageResource("src/main/resources/images/user.png") }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title) },
                 actions = {
                     Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.AccountCircle, contentDescription = "Показать меню")
-                        }
+                        Image(bitmap = users, contentDescription = "Показать меню", Modifier.size(50.dp).clickable { expanded = true })
+
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
@@ -209,54 +218,57 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                 ){
                     when (title) {
                         "Водитель" -> {
-                            IconButton(onClick = {
-                                onLogout(Pages.DriverMainPage)
-                            }) {
-                                Icon(Icons.Default.Home, "Главная страница")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.DriverMainPage) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
                         }
                         "Менеджер" -> {
-                            IconButton(onClick = {
-                                onLogout(Pages.ManagerMainPage)
-                            }) {
-                                Icon(Icons.Default.Home, "Главная страница")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.ManagerMainPage) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
-
-                            IconButton(onClick = {
-                                onLogout(Pages.DataManager)
-                            }) {
-                                Icon(Icons.Filled.Settings, "Данные")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.DataManager) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = databases, contentDescription = "База данных", Modifier.size(30.dp))
                             }
-
-                            IconButton(onClick = {
-                                onLogout(Pages.PreliminaryCostManager)
-                            }){
-                                Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.PreliminaryCostManager) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = calculator, contentDescription = "Расчитать предварительную стоимость", Modifier.size(30.dp))
                             }
                         }
                         else -> {
-                            IconButton(onClick = {
-                                onLogout(Pages.AdministratorMainPage)
-                            }) {
-                                Icon(Icons.Default.Home,  "Главная страница")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.AdministratorMainPage) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
-
-                            IconButton(onClick = {
-                                onLogout(Pages.DataAdministrator)
-                            }) {
-                                Icon(Icons.Filled.Settings, "Данные")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.DataAdministrator) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = databases, contentDescription = "Данные", Modifier.size(30.dp))
                             }
-
-                            IconButton(onClick = {
-                                onLogout(Pages.PreliminaryCostAdmin)
-                            }){
-                                Icon(Icons.Default.ShoppingCart, "Расчитать предварительную стоимость")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.PreliminaryCostAdmin) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = calculator, contentDescription = "Расчитать предварительную стоимость", Modifier.size(30.dp))
                             }
-
-                            IconButton(onClick = {
-                                onLogout(Pages.ReportsAdministrator)
-                            }){
-                                Icon(Icons.Default.Check, "Отчетность")
+                            Column(
+                                Modifier.clickable { onLogout(Pages.ReportsAdministrator) },
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(bitmap = edit, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
                         }
                     }
@@ -264,10 +276,10 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
             }
         }
     ) {
-            innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            content()
-        }
+        innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding)) {
+                content()
+            }
     }
 }
 
@@ -358,6 +370,11 @@ fun saveToCsv(data: List<List<String>>, filePath: String, titles: List<String>) 
     }
 }
 
+fun loadImageResource(path: String): ImageBitmap {
+    val inputStream: InputStream = File(path).inputStream()
+    return loadImageBitmap(inputStream)
+}
+
 @Composable
 fun SelectFileDialog(
     onDialogDismiss: (String) -> Unit
@@ -387,6 +404,7 @@ fun TablePage(
     var dialogWindow by remember { mutableStateOf(false) }
     var confirmation by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
+    val add = remember { loadImageResource("src/main/resources/images/add.png") }
 
     LaunchedEffect(Unit) {
         data = when (tables){
@@ -478,8 +496,9 @@ fun TablePage(
                 if (tables != "Аудит"){
                     FloatingActionButton(onClick = {
                         onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "Добавить")
+                    },
+                    backgroundColor = Color(98, 0, 238)) {
+                        Image(bitmap = add, contentDescription = "Добавить", Modifier.size(30.dp))
                     }
                 }
         }){
