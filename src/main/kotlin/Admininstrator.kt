@@ -259,7 +259,7 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
             savePath = selectedPath
             val titles = listOf("ФИО менеджера", "Количество договоров", "Общая сумма")
             if (savePath.isNotEmpty()) {
-                saveToCsv(data, "contracts_summary", savePath, titles)
+                saveToCsv(data, savePath, titles)
             }
         })
     }
@@ -381,7 +381,7 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
             savePath = selectedPath
             val titles = listOf("ФИО водителя", "Количество договоров", "Общее количество часов")
             if (savePath.isNotEmpty()) {
-                saveToCsv(data, "driver_performance", savePath, titles)
+                saveToCsv(data, savePath, titles)
             }
         })
     }
@@ -701,7 +701,7 @@ fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
             savePath = selectedPath
             val titles = listOf("Наименование", "Объем", "Вес", "Описание")
             if (savePath.isNotEmpty()) {
-                saveToCsv(declaration, "driver_performance", savePath, titles)
+                saveToCsv(declaration, savePath, titles)
             }
         })
     }

@@ -33,6 +33,8 @@ fun App() {
     var currentPage by remember { mutableStateOf(Pages.LoginPage) }
     var currentId by remember { mutableStateOf("") }
 
+    var userID by remember { mutableStateOf("") }
+
     var currentTitle by remember { mutableStateOf("") }
     var currentTable by remember { mutableStateOf("") }
     var currentHead by remember { mutableStateOf(listOf("")) }
@@ -42,20 +44,22 @@ fun App() {
         when (currentPage) {
             Pages.LoginPage -> LoginPage { userId, page ->
                 currentPage = page
-                currentId = userId
+                userID = userId
             }
 
             Pages.AdministratorMainPage -> AdministratorMainPage ({ currentPage = it },
                 { userId, page ->
                 currentPage = page
-                currentId = userId },
+                userID = userId },
             )
-            Pages.DriverMainPage -> DriverMainPage({ userId, page ->
+            Pages.DriverMainPage -> DriverMainPage({ userId, page, driver ->
                 currentPage = page
-                currentId = userId }, { currentPage = it }, currentId)
+                currentId = userId
+                userID = driver
+            }, { currentPage = it }, userID)
             Pages.ManagerMainPage -> ManagerMainPage ({ userId, page ->
                 currentPage = page
-                currentId = userId }, { currentPage = it }
+                userID = userId }, { currentPage = it }
             )
 
             // водитэл
@@ -344,7 +348,7 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     }
 }
 
-fun saveToCsv(data: List<List<String>>, contractID: String, filePath: String, titles: List<String>) {
+fun saveToCsv(data: List<List<String>>, filePath: String, titles: List<String>) {
     val outputFile = File(filePath)
     PrintWriter(outputFile).use { out ->
         out.println(titles)
@@ -634,7 +638,6 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                                 "Воскресенье"
                             )
 
-// Инициализируем состояние с учетом значений из inDay
                             val checkedState = remember {
                                 mutableStateOf(labels.map { inDay.contains(it) }.toBooleanArray())
                             }
@@ -648,7 +651,6 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                                     Checkbox(
                                         checked = checkedState.value[index],
                                         onCheckedChange = { isChecked ->
-                                            // Обновляем состояние при изменении значения
                                             val newCheckedState = checkedState.value.copyOf()
                                             newCheckedState[index] = isChecked
                                             checkedState.value = newCheckedState

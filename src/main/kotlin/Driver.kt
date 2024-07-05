@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.toSize
 
 @Composable
 fun DriverMainPage(
-    onLoginSuccess: (userData: String, page: Pages) -> Unit,
+    onLoginSuccess: (userData: String, page: Pages, driverID: String) -> Unit,
     onLogout: (Pages) -> Unit,
     driverID: String
 ) {
@@ -43,25 +43,25 @@ fun DriverMainPage(
                 ) {
                     Button(onClick = {
                         dialogWindow = false
-                        onLoginSuccess(currentId, Pages.FillInfoTripDriver)
+                        onLoginSuccess(currentId, Pages.FillInfoTripDriver, driverID)
                     }) {
                         Text("Просмотреть полную информацию", fontSize = 15.sp)
                     }
                     Button(onClick = {
                         dialogWindow = false
-                        onLoginSuccess(currentId, Pages.CargosWithTripDriver)
+                        onLoginSuccess(currentId, Pages.CargosWithTripDriver, driverID)
                     }) {
                         Text("Просмотреть грузы", fontSize = 15.sp)
                     }
                     Button(onClick = {
                         dialogWindow = false
-                        onLoginSuccess(currentId, Pages.DepartPointsDriver)
+                        onLoginSuccess(currentId, Pages.DepartPointsDriver, driverID)
                     }) {
                         Text("Просмотреть точки назначения", fontSize = 15.sp)
                     }
                     Button(onClick = {
                         dialogWindow = false
-                        onLoginSuccess(currentId, Pages.DeclarationDriver)
+                        onLoginSuccess(currentId, Pages.DeclarationDriver, driverID)
                     }) {
                         Text("Создать декларацию на грузы", fontSize = 15.sp)
                     }
@@ -284,7 +284,7 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
             savePath = selectedPath
             val titles = listOf("Наименование", "Объем", "Вес", "Описание")
             if (savePath.isNotEmpty()) {
-                saveToCsv(declaration, contractID, savePath, titles)
+                saveToCsv(declaration, savePath, titles)
             }
         })
     }
