@@ -561,6 +561,22 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
     var inDay by remember { mutableStateOf(listOf("")) }
     var pasport by remember { mutableStateOf(listOf("")) }
     var dialogWindow by remember { mutableStateOf(false) }
+    val typePoints = listOf("Отправление", "Прибытие")
+    var typeExpanded by remember { mutableStateOf(false) }
+    var typeSelectedText by remember { mutableStateOf("") }
+    var typeTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val typeIcon = if (typeExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+    var statusExpanded by remember { mutableStateOf(false) }
+    val statusPoints = listOf("Доставлен", "В работе", "Отменен")
+    var statusSelectedText by remember { mutableStateOf("") }
+    var statusTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val statusIcon = if (statusExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
 
     LaunchedEffect(Unit) {
         if (table != "Сотрудники"){
@@ -587,6 +603,19 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
     }
 
     if (dialogWindow) {
+        val typeIndex = head.indexOf("Тип")
+        if (typeIndex != -1) {
+            data = data.toMutableList().apply {
+                this[typeIndex] = typeSelectedText
+            }
+        }
+        val statusIndex = head.indexOf("Статус")
+        if (statusIndex != -1) {
+            data = data.toMutableList().apply {
+                this[statusIndex] = statusSelectedText
+            }
+        }
+
         AlertDialog(
             onDismissRequest = { dialogWindow = false },
             title = { Text(text = "Подтвердите действие") },
@@ -693,6 +722,66 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                                         }
                                     )
                                     Text(label)
+                                }
+                            }
+                        } else if (table == "Точки назначения" && head[i] == "Тип") {
+                            OutlinedTextField(
+                                value = typeSelectedText,
+                                onValueChange = { typeSelectedText = it },
+                                modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        typeTextFieldSize = coordinates.size.toSize()
+                                    },
+                                label = {Text("Тип точки назначения")},
+                                trailingIcon = {
+                                    Icon(typeIcon,"",
+                                        Modifier.clickable { typeExpanded = !typeExpanded })
+                                }
+                            )
+
+                            DropdownMenu(
+                                expanded = typeExpanded,
+                                onDismissRequest = { typeExpanded = false },
+                                modifier = Modifier
+                                    .width(with(LocalDensity.current){typeTextFieldSize.width.toDp()})
+                            ) {
+                                typePoints.forEach { label ->
+                                    DropdownMenuItem(onClick = {
+                                        typeSelectedText = label
+                                        typeExpanded = false
+                                    }) {
+                                        Text(text = label)
+                                    }
+                                }
+                            }
+                        }  else if (table == "Точки назначения" && head[i] == "Статус") {
+                            OutlinedTextField(
+                                value = statusSelectedText,
+                                onValueChange = { statusSelectedText = it },
+                                modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        statusTextFieldSize = coordinates.size.toSize()
+                                    },
+                                label = {Text("Статус точки назначения")},
+                                trailingIcon = {
+                                    Icon(statusIcon,"",
+                                        Modifier.clickable { statusExpanded = !statusExpanded })
+                                }
+                            )
+
+                            DropdownMenu(
+                                expanded = statusExpanded,
+                                onDismissRequest = { statusExpanded = false },
+                                modifier = Modifier
+                                    .width(with(LocalDensity.current){statusTextFieldSize.width.toDp()})
+                            ) {
+                                statusPoints.forEach { label ->
+                                    DropdownMenuItem(onClick = {
+                                        statusSelectedText = label
+                                        statusExpanded = false
+                                    }) {
+                                        Text(text = label)
+                                    }
                                 }
                             }
                         } else {
