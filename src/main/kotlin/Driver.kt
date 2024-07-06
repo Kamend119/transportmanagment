@@ -388,7 +388,6 @@ fun UpdateStatus(onLogout: (Pages) -> Unit, id: String){
                 value = mSelectedText,
                 onValueChange = { mSelectedText = it },
                 modifier = Modifier
-                    .fillMaxWidth()
                     .onGloballyPositioned { coordinates ->
                         mTextFieldSize = coordinates.size.toSize()
                     },

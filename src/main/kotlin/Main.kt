@@ -21,9 +21,16 @@ import java.io.File
 import java.io.PrintWriter
 import javax.swing.JFileChooser
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.unit.toSize
 import java.io.InputStream
 
 @Composable
@@ -732,29 +739,31 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
 }
 
 @Composable
-fun AddPage(
-    onLogout: (Pages) -> Unit,
-    title: String,
-    heads: List<String>,
-    table: String,
-    currentId: String,
-    currentPagess: Pages
-) {
-    var data by remember { mutableStateOf(List(heads.size) { "" }) } // Initialize with the size of heads
+fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: String,currentId: String,currentPagess: Pages) {
+    var data by remember { mutableStateOf(List(heads.size) { "" }) }
     var inDay by remember { mutableStateOf(listOf<String>()) }
     var passport by remember { mutableStateOf(List(4) { "" }) }
     var dialogWindow by remember { mutableStateOf(false) }
-    var head by remember { mutableStateOf(heads) } // Initialize head with heads list
+    var head by remember { mutableStateOf(heads) }
     var dropRow by remember { mutableStateOf(listOf<String>()) }
+    val typePoints = listOf("Отправление", "Прибытие")
+    var typeExpanded by remember { mutableStateOf(false) }
+    var typeSelectedText by remember { mutableStateOf("") }
+    var typeTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val typeIcon = if (typeExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
 
     LaunchedEffect(Unit) {
         dropRow = when (table) {
-            "Договоры" ->  listOf("ID", "Стоимость", "Дата заключения")
+            "Договоры" -> listOf("ID", "Стоимость", "Дата заключения")
+            "Точки назначения" -> listOf("ID", "Статус", "Тип")
             else -> listOf("ID")
         }
 
         head = heads.filterNot { it in dropRow }
-        data = List(head.size) { "" } // Update data with the new size of head
+        data = List(head.size) { "" }
     }
 
     if (dialogWindow) {
@@ -768,13 +777,14 @@ fun AddPage(
                 ) {
                     Button(onClick = {
                         dialogWindow = false
+                        println(data)
                         when (table) {
                             "Контактные лица" -> createContact(data)
                             "Автопарки" -> createAutopark(data)
                             "Автомобили" -> createCar(data)
                             "Должности" -> createJob(data)
                             "Сотрудники" -> createEmployee(data, inDay, passport)
-                            "Точки назначения" -> createDestinationPoint(data)
+                            "Точки назначения" -> createDestinationPoint(data, typeSelectedText)
                             "Клиенты" -> createCustomer(data)
                             "Классификация грузов" -> createCargoClass(data)
                             "Дополнительные услуги" -> createAdditionalService(data)
@@ -825,7 +835,17 @@ fun AddPage(
                                     },
                                     label = { Text(label) }
                                 )
-                            } else if (table != "Договоры") {
+                            } else if (table == "Точки назначения" && label != "Тип" && label != "Статус") {
+                                OutlinedTextField(
+                                    value = data.getOrElse(i) { "" },
+                                    onValueChange = { newData ->
+                                        data = data.toMutableList().apply {
+                                            if (size > i) set(i, newData) else add(newData)
+                                        }
+                                    },
+                                    label = { Text(label) }
+                                )
+                            }  else {
                                 OutlinedTextField(
                                     value = data.getOrElse(i) { "" },
                                     onValueChange = { newData ->
@@ -897,6 +917,37 @@ fun AddPage(
                                         label = { Text(label) }
                                     )
                                 }
+                            }
+                        }
+                    }
+                }
+                if (table == "Точки назначения") {
+                    OutlinedTextField(
+                        value = typeSelectedText,
+                        onValueChange = { typeSelectedText = it },
+                        modifier = Modifier
+                            .onGloballyPositioned { coordinates ->
+                                typeTextFieldSize = coordinates.size.toSize()
+                            },
+                        label = {Text("Тип точки назначения")},
+                        trailingIcon = {
+                            Icon(typeIcon,"",
+                                Modifier.clickable { typeExpanded = !typeExpanded })
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = typeExpanded,
+                        onDismissRequest = { typeExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current){typeTextFieldSize.width.toDp()})
+                    ) {
+                        typePoints.forEach { label ->
+                            DropdownMenuItem(onClick = {
+                                typeSelectedText = label
+                                typeExpanded = false
+                            }) {
+                                Text(text = label)
                             }
                         }
                     }

@@ -516,12 +516,12 @@ fun deleteEmployee(employeeId: Int) {
     }
 }
 
-fun createDestinationPoint(data: List<String>) {
+fun createDestinationPoint(data: List<String>, type : String) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL create_destinationpoint('${data[0]}', '${data[1]}'::varchar, '${data[2]}'::varchar, " +
-                        "'${data[3]}'::date, '${data[4]}', ${data[5].toInt()}::int)")
+                connection.prepareStatement("CALL create_destinationpoint('$type', '${data[0]}'::varchar, '${data[1]}'::varchar, " +
+                        "'${data[2]}'::date, 'В работе', ${data[3].toInt()}::int)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
