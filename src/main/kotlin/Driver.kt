@@ -257,7 +257,7 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String, onLoginSuc
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.Transparent)
-                                .clickable { onLoginSuccess(Pages.UpdateStatus, contractID) }
+                                .clickable { onLoginSuccess(Pages.UpdateStatus, trip[0]) }
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         )  {

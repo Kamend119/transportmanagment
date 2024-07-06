@@ -142,8 +142,8 @@ fun updateStatusDestinationPoints(contractId: String, status: String) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("SELECT * FROM update_destination_status(${contractId.toInt()}, '$status')")
-            statement.executeUpdate()
+                connection.prepareStatement("SELECT update_destination_status(${contractId.toInt()}, '$status')")
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
