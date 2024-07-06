@@ -48,8 +48,9 @@ fun App() {
 
             Pages.AdministratorMainPage -> AdministratorMainPage ({ currentPage = it },
                 { userId, page ->
-                currentPage = page
-                userID = userId },
+                    currentId = userId
+                    currentPage = page
+                },
             )
             Pages.DriverMainPage -> DriverMainPage({ userId, page, driver ->
                 currentPage = page
@@ -192,7 +193,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                 title = { Text(title) },
                 actions = {
                     Box {
-                        Image(bitmap = users, contentDescription = "Показать меню", Modifier.size(50.dp).clickable { expanded = true })
+                        Image(bitmap = users, contentDescription = "Показать меню", Modifier.size(60.dp).clickable { expanded = true }.padding(15.dp))
 
                         DropdownMenu(
                             expanded = expanded,
@@ -214,7 +215,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                     when (title) {
                         "Водитель" -> {
                             Column(
-                                Modifier.clickable { onLogout(Pages.DriverMainPage) },
+                                Modifier.clickable { onLogout(Pages.DriverMainPage) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
@@ -222,19 +223,19 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                         }
                         "Менеджер" -> {
                             Column(
-                                Modifier.clickable { onLogout(Pages.ManagerMainPage) },
+                                Modifier.clickable { onLogout(Pages.ManagerMainPage) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
                             Column(
-                                Modifier.clickable { onLogout(Pages.DataManager) },
+                                Modifier.clickable { onLogout(Pages.DataManager) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = databases, contentDescription = "База данных", Modifier.size(30.dp))
                             }
                             Column(
-                                Modifier.clickable { onLogout(Pages.PreliminaryCostManager) },
+                                Modifier.clickable { onLogout(Pages.PreliminaryCostManager) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = calculator, contentDescription = "Расчитать предварительную стоимость", Modifier.size(30.dp))
@@ -242,25 +243,25 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
                         }
                         else -> {
                             Column(
-                                Modifier.clickable { onLogout(Pages.AdministratorMainPage) },
+                                Modifier.clickable { onLogout(Pages.AdministratorMainPage) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = home, contentDescription = "Главная страница", Modifier.size(30.dp))
                             }
                             Column(
-                                Modifier.clickable { onLogout(Pages.DataAdministrator) },
+                                Modifier.clickable { onLogout(Pages.DataAdministrator) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = databases, contentDescription = "Данные", Modifier.size(30.dp))
                             }
                             Column(
-                                Modifier.clickable { onLogout(Pages.PreliminaryCostAdmin) },
+                                Modifier.clickable { onLogout(Pages.PreliminaryCostAdmin) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = calculator, contentDescription = "Расчитать предварительную стоимость", Modifier.size(30.dp))
                             }
                             Column(
-                                Modifier.clickable { onLogout(Pages.ReportsAdministrator) },
+                                Modifier.clickable { onLogout(Pages.ReportsAdministrator) }.padding(15.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(bitmap = edit, contentDescription = "Главная страница", Modifier.size(30.dp))

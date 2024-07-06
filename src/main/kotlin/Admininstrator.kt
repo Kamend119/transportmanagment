@@ -1,12 +1,17 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,14 +40,14 @@ fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: 
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        dialogWindow = false
                         onLoginSuccess(currentId, Pages.FillInfoTripAdministrator)
+                        dialogWindow = false
                     }) {
                         Text("Просмотреть полную информацию", fontSize = 15.sp)
                     }
                     Button(onClick = {
-                        dialogWindow = false
                         onLoginSuccess(currentId, Pages.DeclarationAdministrator)
+                        dialogWindow = false
                     }) {
                         Text("Создать декларацию на грузы", fontSize = 15.sp)
                     }
@@ -239,6 +244,7 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     var savePath by remember { mutableStateOf("") }
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val download = remember { loadImageResource("src/main/resources/images/download.png") }
 
     if (dialogWindow) {
         AlertDialog(
@@ -279,47 +285,61 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = startDate,
-                    onValueChange = { startDate = it },
-                    label = { Text("Начало периода") }
-                )
-
-                OutlinedTextField(
-                    value = endDate,
-                    onValueChange = { endDate = it },
-                    label = { Text("Конец периода") }
-                )
-
-                Button(onClick = {
-                    val startDateString = startDate.text
-                    val endDateString = endDate.text
-                    try {
-                        val start = LocalDate.parse(startDateString, dateFormatter)
-                        val end = LocalDate.parse(endDateString, dateFormatter)
-                        if (start.isAfter(end)) {
-                            dialogMessage = "Дата начала не может быть позже даты окончания!"
-                            dialogWindow = true
-                        } else {
-                            data = contractsSummaryForPeriod(startDateString, endDateString)
-                        }
-                    } catch (e: DateTimeParseException) {
-                        dialogMessage = "Введите даты в формате день-месяц-год"
-                        dialogWindow = true
-                    }
-                }) {
-                    Text("Расчитать")
-                }
-
-                Button(
-                    onClick = {
-                        showDialog = true
-                    }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Сохранить в CSV")
+                    OutlinedTextField(
+                        value = startDate,
+                        onValueChange = { startDate = it },
+                        label = { Text("Начало периода") }
+                    )
+
+                    OutlinedTextField(
+                        value = endDate,
+                        onValueChange = { endDate = it },
+                        label = { Text("Конец периода") }
+                    )
+
+                    Button(onClick = {
+                        val startDateString = startDate.text
+                        val endDateString = endDate.text
+                        try {
+                            val start = LocalDate.parse(startDateString, dateFormatter)
+                            val end = LocalDate.parse(endDateString, dateFormatter)
+                            if (start.isAfter(end)) {
+                                dialogMessage = "Дата начала не может быть позже даты окончания!"
+                                dialogWindow = true
+                            } else {
+                                data = contractsSummaryForPeriod(startDateString, endDateString)
+                            }
+                        } catch (e: DateTimeParseException) {
+                            dialogMessage = "Введите даты в формате день-месяц-год"
+                            dialogWindow = true
+                        }
+                    }) {
+                        Text("Расчитать")
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(37.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(98, 0, 238))
+                            .clickable { showDialog = true }
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            bitmap = download,
+                            contentDescription = "Сохранить CSV",
+                            modifier = Modifier.size(30.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
 
@@ -361,6 +381,7 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     var savePath by remember { mutableStateOf("") }
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val download = remember { loadImageResource("src/main/resources/images/download.png") }
 
     if (dialogWindow) {
         AlertDialog(
@@ -401,47 +422,61 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = startDate,
-                    onValueChange = { startDate = it },
-                    label = { Text("Начало периода") }
-                )
-
-                OutlinedTextField(
-                    value = endDate,
-                    onValueChange = { endDate = it },
-                    label = { Text("Конец периода") }
-                )
-
-                Button(onClick = {
-                    val startDateString = startDate.text
-                    val endDateString = endDate.text
-                    try {
-                        val start = LocalDate.parse(startDateString, dateFormatter)
-                        val end = LocalDate.parse(endDateString, dateFormatter)
-                        if (start.isAfter(end)) {
-                            dialogMessage = "Дата начала не может быть позже даты окончания!"
-                            dialogWindow = true
-                        } else {
-                            data = driverPerformanceForPeriod(startDateString, endDateString)
-                        }
-                    } catch (e: DateTimeParseException) {
-                        dialogMessage = "Введите даты в формате день-месяц-год"
-                        dialogWindow = true
-                    }
-                }) {
-                    Text("Расчитать")
-                }
-
-                Button(
-                    onClick = {
-                        showDialog = true
-                    }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Сохранить в CSV")
+                    OutlinedTextField(
+                        value = startDate,
+                        onValueChange = { startDate = it },
+                        label = { Text("Начало периода") }
+                    )
+
+                    OutlinedTextField(
+                        value = endDate,
+                        onValueChange = { endDate = it },
+                        label = { Text("Конец периода") }
+                    )
+
+                    Button(onClick = {
+                        val startDateString = startDate.text
+                        val endDateString = endDate.text
+                        try {
+                            val start = LocalDate.parse(startDateString, dateFormatter)
+                            val end = LocalDate.parse(endDateString, dateFormatter)
+                            if (start.isAfter(end)) {
+                                dialogMessage = "Дата начала не может быть позже даты окончания!"
+                                dialogWindow = true
+                            } else {
+                                data = driverPerformanceForPeriod(startDateString, endDateString)
+                            }
+                        } catch (e: DateTimeParseException) {
+                            dialogMessage = "Введите даты в формате день-месяц-год"
+                            dialogWindow = true
+                        }
+                    }) {
+                        Text("Расчитать")
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(37.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(98, 0, 238))
+                            .clickable { showDialog = true }
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            bitmap = download,
+                            contentDescription = "Сохранить CSV",
+                            modifier = Modifier.size(30.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
 
@@ -690,6 +725,7 @@ fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
     var showDialog by remember { mutableStateOf(false) }
     var savePath by remember { mutableStateOf("") }
+    val download = remember { loadImageResource("src/main/resources/images/download.png") }
 
     LaunchedEffect(Unit) {
         declaration = generateCargoDeclaration(contractID)
@@ -740,24 +776,33 @@ fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
                             }
                         }
                     }
+                    item{
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(37.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(98, 0, 238))
+                                    .clickable { showDialog = true }
+                                    .padding(10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    bitmap = download,
+                                    contentDescription = "Сохранить CSV",
+                                    modifier = Modifier.size(30.dp),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    }
                 }
-            }
-        }
-
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Button(
-                onClick = {
-                    showDialog = true
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Сохранить в CSV")
             }
         }
     }

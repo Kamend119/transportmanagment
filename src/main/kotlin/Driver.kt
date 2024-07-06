@@ -1,7 +1,9 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -9,8 +11,10 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -273,6 +277,7 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
     var showDialog by remember { mutableStateOf(false) }
     var savePath by remember { mutableStateOf("") }
+    val download = remember { loadImageResource("src/main/resources/images/download.png") }
 
     LaunchedEffect(Unit) {
         declaration = generateCargoDeclaration(contractID)
@@ -323,24 +328,33 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
                             }
                         }
                     }
+                    item{
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(37.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(98, 0, 238))
+                                    .clickable { showDialog = true }
+                                    .padding(10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    bitmap = download,
+                                    contentDescription = "Сохранить CSV",
+                                    modifier = Modifier.size(30.dp),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    }
                 }
-            }
-        }
-
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            Button(
-                onClick = {
-                    showDialog = true
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Сохранить в CSV")
             }
         }
     }
