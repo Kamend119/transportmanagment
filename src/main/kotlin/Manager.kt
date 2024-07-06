@@ -211,8 +211,8 @@ fun FillInfoTripManager(onLogout: (Pages) -> Unit, contractID: String) {
             val headers = listOf(
                 "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
                 "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
-                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
-                "Адрес", "Дата", "Дополнительные услуги"
+                "Модель автомобиля", "Производитель автомобиля",
+                "Точки назначения", "Дополнительные услуги"
             )
 
             val contractInfo = declaration.getOrNull(0) ?: listOf()
@@ -362,7 +362,7 @@ fun DataManager(onLogout: (Pages) -> Unit,
                             .clickable {
                                 onLoginSuccess(
                                     "Менеджер",
-                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус"),
+                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"),
                                     "Точки назначения",
                                     Pages.DataManager,
                                     Pages.TablePage
@@ -393,7 +393,7 @@ fun DataManager(onLogout: (Pages) -> Unit,
                                 onLoginSuccess(
                                     "Менеджер",
                                     listOf("ID","Дата заключения","Стоимость","ID клиента",
-                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения", "Статус"),
+                                        "ID менеджера","ID водителя","ID автомобиля", "Статус"),
                                     "Договоры",
                                     Pages.DataManager,
                                     Pages.TablePage

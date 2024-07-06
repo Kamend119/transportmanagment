@@ -51,7 +51,7 @@ fun deleteContact(contactId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contact($contactId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -104,7 +104,7 @@ fun deleteAutopark(autoparkId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_autopark($autoparkId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -159,7 +159,7 @@ fun deleteCar(carId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_car($carId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -212,7 +212,7 @@ fun deleteAdditionalService(serviceId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_additional_service($serviceId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -266,7 +266,7 @@ fun deleteCustomer(customerId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_customer($customerId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -317,7 +317,7 @@ fun deleteCargoClass(cargoClassId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo_class($cargoClassId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -328,7 +328,7 @@ fun createCargo(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL create_cargo('${data[0]}'::varchar, ${data[1].toFloat()}, " +
+                connection.prepareStatement("CALL create_cargo('${data[0]}', ${data[1].toFloat()}, " +
                         "${data[2].toFloat()}, ${data[3].toInt()}::int, ${data[4].toInt()}::int)")
             statement.executeUpdate()
         }
@@ -372,8 +372,8 @@ fun updateCargo(data: List<String>) {
 fun deleteCargo(cargoId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo($cargoId)")
-            statement.executeUpdate()
+            val statement: PreparedStatement = connection.prepareStatement("SELECT delete_cargo($cargoId::int)")
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -422,7 +422,7 @@ fun deleteJob(jobId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_job($jobId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -509,7 +509,7 @@ fun deleteEmployee(employeeId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_employee($employeeId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -567,7 +567,7 @@ fun deleteDestinationPoint(pointId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_destinationpoint($pointId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -578,9 +578,8 @@ fun createContract(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL create_contract('${data[0]}'::date, " +
-                        "${data[1].toInt()}::int, ${data[2].toInt()}::int, ${data[3].toInt()}::int, " +
-                        "${data[4].toInt()}::int")
+                connection.prepareStatement("CALL create_contract(${data[0].toInt()}::int, ${data[1].toInt()}::int, " +
+                        "${data[2].toInt()}::int, ${data[3].toInt()}::int)")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -626,7 +625,7 @@ fun deleteContract(contractId: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract($contractId)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()
@@ -679,7 +678,7 @@ fun deleteContractAdditionalService(id: Int) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement = connection.prepareStatement("SELECT delete_contract_additional_service($id)")
-            statement.executeUpdate()
+            statement.executeQuery()
         }
     } catch (e: SQLException) {
         e.printStackTrace()

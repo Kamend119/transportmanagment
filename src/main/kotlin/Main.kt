@@ -418,7 +418,6 @@ fun TablePage(
             else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
         }
     }
-    println(data)
 
     if (dialogWindow) {
         AlertDialog(
@@ -455,7 +454,6 @@ fun TablePage(
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        confirmation = false
                         when (tables){
                             "Контактные лица" -> deleteContact(currentId.toInt())
                             "Автопарки" -> deleteAutopark(currentId.toInt())
@@ -468,8 +466,23 @@ fun TablePage(
                             "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
                             "Договоры" -> deleteContract(currentId.toInt())
                             "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
-                            else -> if (titles == "Грузы") deleteCargo(currentId.toInt())
+                            else -> if (tables == "Грузы") deleteCargo(currentId.toInt())
                         }
+                        data = when (tables){
+                            "Контактные лица" -> viewContactsInfo()
+                            "Автопарки" -> viewAutoparkInfo()
+                            "Автомобили" -> viewCarInfo()
+                            "Должности" -> viewJobsInfo()
+                            "Сотрудники" -> viewEmployeeInfo()
+                            "Точки назначения" -> viewDestinationPointsInfo()
+                            "Клиенты" -> viewCustomersInfo()
+                            "Классификация грузов" -> viewClassCargosInfo()
+                            "Дополнительные услуги" -> viewAdditionalServicesInfo()
+                            "Договоры" -> viewContractInfo()
+                            "Договор Дополнительные услуги" -> viewContractAdditionalService()
+                            else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
+                        }
+                        confirmation = false
                     }) {
                         Text("Ок", fontSize = 15.sp)
                     }
@@ -719,11 +732,30 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
 }
 
 @Composable
-fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages) {
-    var data by remember { mutableStateOf(List(head.size) { "" }) }
+fun AddPage(
+    onLogout: (Pages) -> Unit,
+    title: String,
+    heads: List<String>,
+    table: String,
+    currentId: String,
+    currentPagess: Pages
+) {
+    var data by remember { mutableStateOf(List(heads.size) { "" }) } // Initialize with the size of heads
     var inDay by remember { mutableStateOf(listOf<String>()) }
     var passport by remember { mutableStateOf(List(4) { "" }) }
     var dialogWindow by remember { mutableStateOf(false) }
+    var head by remember { mutableStateOf(heads) } // Initialize head with heads list
+    var dropRow by remember { mutableStateOf(listOf<String>()) }
+
+    LaunchedEffect(Unit) {
+        dropRow = when (table) {
+            "Договоры" ->  listOf("ID", "Стоимость", "Дата заключения")
+            else -> listOf("ID")
+        }
+
+        head = heads.filterNot { it in dropRow }
+        data = List(head.size) { "" } // Update data with the new size of head
+    }
 
     if (dialogWindow) {
         AlertDialog(
@@ -782,34 +814,49 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
             ) {
                 if (table != "Сотрудники") {
                     head.forEachIndexed { i, label ->
-                        if (head[i] != "ID") {
-                            OutlinedTextField(
-                                value = data[i],
-                                onValueChange = { newData ->
-                                    data = data.toMutableList().also { it[i] = newData }
-                                },
-                                label = { Text(label) }
-                            )
+                        if (label != "ID") {
+                            if (table == "Договоры" && label != "Стоимость" && label != "Дата заключения" && label != "Статус") {
+                                OutlinedTextField(
+                                    value = data.getOrElse(i) { "" },
+                                    onValueChange = { newData ->
+                                        data = data.toMutableList().apply {
+                                            if (size > i) set(i, newData) else add(newData)
+                                        }
+                                    },
+                                    label = { Text(label) }
+                                )
+                            } else if (table != "Договоры") {
+                                OutlinedTextField(
+                                    value = data.getOrElse(i) { "" },
+                                    onValueChange = { newData ->
+                                        data = data.toMutableList().apply {
+                                            if (size > i) set(i, newData) else add(newData)
+                                        }
+                                    },
+                                    label = { Text(label) }
+                                )
+                            }
                         }
                     }
                 } else {
                     head.forEachIndexed { i, label ->
-                        if (head[i] != "ID") {
+                        if (label != "ID") {
                             when (label) {
                                 "Паспортные данные" -> {
                                     Text("Паспортные данные")
                                     val passportLabels = listOf("Серия", "Номер", "Кем выдан", "Когда выдан")
                                     passportLabels.forEachIndexed { j, passportLabel ->
                                         OutlinedTextField(
-                                            value = passport[j],
+                                            value = passport.getOrElse(j) { "" },
                                             onValueChange = { newData ->
-                                                passport = passport.toMutableList().also { it[j] = newData }
+                                                passport = passport.toMutableList().apply {
+                                                    if (size > j) set(j, newData) else add(newData)
+                                                }
                                             },
                                             label = { Text(passportLabel) }
                                         )
                                     }
                                 }
-
                                 "Рабочие дни" -> {
                                     Text("Рабочие дни")
                                     val daysOfWeek = listOf(
@@ -839,12 +886,13 @@ fun AddPage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table:
                                         }
                                     }
                                 }
-
                                 else -> {
                                     OutlinedTextField(
-                                        value = data[i],
+                                        value = data.getOrElse(i) { "" },
                                         onValueChange = { newData ->
-                                            data = data.toMutableList().also { it[i] = newData }
+                                            data = data.toMutableList().apply {
+                                                if (size > i) set(i, newData) else add(newData)
+                                            }
                                         },
                                         label = { Text(label) }
                                     )

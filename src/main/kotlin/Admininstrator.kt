@@ -3,7 +3,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -650,7 +649,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                                 onLoginSuccess(
                                     "Администратор",
                                     listOf("ID","Дата заключения","Стоимость","ID клиента",
-                                        "ID менеджера","ID водителя","ID автомобиля","ID точки назначения", "Статус"),
+                                        "ID менеджера","ID водителя","ID автомобиля", "Статус"),
                                     "Договоры",
                                     Pages.DataAdministrator,
                                     Pages.TablePage
@@ -832,8 +831,8 @@ fun FillInfoTripAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
             val headers = listOf(
                 "ID", "Дата заключения договора", "Стоимость", "ФИО клиента",
                 "ФИО менеджера", "ФИО водителя", "Номер автомобиля",
-                "Модель автомобиля", "Производитель автомобиля", "Тип ", "Город",
-                "Адрес", "Дата", "Дополнительные услуги"
+                "Модель автомобиля", "Производитель автомобиля",
+                "Точки назначения", "Дополнительные услуги"
             )
 
             val contractInfo = declaration.getOrNull(0) ?: listOf()

@@ -119,7 +119,6 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
     val result = mutableListOf<List<String>>()
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println("SELECT * FROM get_contract_destination_points(${contractId.toInt()})")
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_destination_points(${contractId.toInt()})")
             while (resultSet.next()) {
@@ -142,7 +141,6 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
 fun updateStatusDestinationPoints(contractId: String, status: String) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            println("SELECT * FROM update_destination_status(${contractId.toInt()}, '$status')")
             val statement: PreparedStatement =
                 connection.prepareStatement("SELECT * FROM update_destination_status(${contractId.toInt()}, '$status')")
             statement.executeUpdate()
@@ -330,7 +328,8 @@ fun viewDestinationPointsInfo(): List<List<String>> {
                     resultSet.getString("city")?: "",
                     resultSet.getString("address")?: "",
                     resultSet.getDate("arrivaldate").toString()?: "",
-                    resultSet.getString("status")?: ""
+                    resultSet.getString("status")?: "",
+                    resultSet.getInt("contract_id").toString()
                 )
                 result.add(row)
             }
