@@ -32,6 +32,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.unit.toSize
 import java.io.InputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @Composable
 @Preview
@@ -108,8 +111,6 @@ fun App() {
             Pages.PreliminaryCostAdmin -> PreliminaryCostAdmin{ currentPage = it }
             Pages.DeclarationAdministrator -> DeclarationAdministrator({ currentPage = it }, currentId)
 
-
-            //
             Pages.UpdatePage -> UpdatePage(
                 { page -> currentPage = page },
                 currentTitle,
@@ -136,9 +137,7 @@ fun App() {
                 { page -> currentPage = page },
                 currentTitle,
                 currentHead,
-                currentTable,
-                currentId,
-                currentPages
+                currentTable
             )
         }
     }
@@ -556,10 +555,13 @@ fun TablePage(
 }
 
 @Composable
-fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages){
+fun UpdatePage(onLogout: (Pages) -> Unit, title: String, heads: List<String>, table: String, currentId: String, currentPagess: Pages){
     var data by remember { mutableStateOf(listOf("")) }
     var inDay by remember { mutableStateOf(listOf("")) }
     var pasport by remember { mutableStateOf(listOf("")) }
+    var head by remember { mutableStateOf(listOf("")) }
+    var errorWindow by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf("") }
     var dialogWindow by remember { mutableStateOf(false) }
     val typePoints = listOf("Отправление", "Прибытие")
     var typeExpanded by remember { mutableStateOf(false) }
@@ -577,8 +579,15 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     LaunchedEffect(Unit) {
+        if (table == "Договоры"){
+            val drop = listOf("Стоимость","Статус")
+            head = heads.filterNot { it in drop }
+            data = List(head.size) { "" }
+        } else head = heads
+
         if (table != "Сотрудники"){
             data = when (table){
                 "Контактные лица" -> getContact(currentId.toInt())
@@ -819,7 +828,58 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
                     )
                 }
 
-                Button(onClick = { dialogWindow = true }) {
+                Button(onClick = {
+                    var err = false
+                    head.forEachIndexed { index, item ->
+                        val fieldValue = data[index]
+
+                        if (item.contains("дата", ignoreCase = true)) {
+                            try {
+                                LocalDate.parse(data[index], dateFormatter)
+                            } catch (e: DateTimeParseException) {
+                                errorText = "Неправильный формат даты в поле: ${head[index]} - ${data[index]}\nВведите дату в формате год-месяц-день"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("телефон", ignoreCase = true)) {
+                            val phoneNumber = data[index]
+                            if (!phoneNumber.matches(Regex("^89\\d{9}\$"))) {
+                                errorText = "Неправильный формат номера телефона в поле: ${head[index]} - $phoneNumber\nНомер должен содержать только цифры, быть длиной в 11 символов и начинаться с 89"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("Гос. номер", ignoreCase = true)) {
+                            val stateNumber = data[index]
+                            if (!stateNumber.matches(Regex("^[A-ZА-Я]\\d{3}[A-ZА-Я]{2}\$"))) {
+                                errorText = "Неправильный формат гос. номера в поле: ${head[index]} - $stateNumber\nНомер должен содержать одну букву, три цифры и две буквы (например, A123BC)"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("ID", ignoreCase = true)) {
+                            if (!fieldValue.matches(Regex("^\\d+\$"))) {
+                                errorText = "Неправильный формат ID в поле: ${head[index]} - $fieldValue\nID должен содержать только цифры"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("Вес", ignoreCase = true) || item.contains("Объем", ignoreCase = true) || item.contains("Стоимость", ignoreCase = true)) {
+                            if (!fieldValue.matches(Regex("^\\d+\\.?\\d*\$"))) {
+                                errorText = "Неправильный формат в поле: ${head[index]} - $fieldValue\nЗначение должно быть целым числом или числом с плавающей точкой (например, 123 или 123.45)"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+                    }
+
+                    if(!err) dialogWindow = true
+                }) {
                     Text("Сохранить")
                 }
             }
@@ -828,25 +888,30 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, head: List<String>, tab
 }
 
 @Composable
-fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: String,currentId: String,currentPagess: Pages) {
-    var data by remember { mutableStateOf(List(heads.size) { "" }) }
+fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: String) {
+    var data by remember { mutableStateOf(listOf<String>()) }
     var inDay by remember { mutableStateOf(listOf<String>()) }
     var passport by remember { mutableStateOf(List(4) { "" }) }
+    var errorWindow by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf("") }
     var dialogWindow by remember { mutableStateOf(false) }
     var head by remember { mutableStateOf(heads) }
     var dropRow by remember { mutableStateOf(listOf<String>()) }
     val typePoints = listOf("Отправление", "Прибытие")
     var typeExpanded by remember { mutableStateOf(false) }
     var typeSelectedText by remember { mutableStateOf("") }
-    var typeTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    var typeTextFieldSize by remember { mutableStateOf(Size.Zero) }
     val typeIcon = if (typeExpanded)
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
 
+    var password by remember { mutableStateOf("") }
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
     LaunchedEffect(Unit) {
         dropRow = when (table) {
-            "Договоры" -> listOf("ID", "Стоимость", "Дата заключения")
+            "Договоры" -> listOf("ID", "Стоимость", "Дата заключения", "Статус")
             "Точки назначения" -> listOf("ID", "Статус", "Тип")
             else -> listOf("ID")
         }
@@ -865,7 +930,7 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        dialogWindow = false
+                        data += password
                         println(data)
                         when (table) {
                             "Контактные лица" -> createContact(data)
@@ -882,6 +947,7 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                             else -> if (table == "Грузы") createCargo(data)
                         }
                         onLogout(Pages.TablePage)
+                        dialogWindow = false
                     }) {
                         Text("Добавить", fontSize = 15.sp)
                     }
@@ -890,6 +956,20 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                     }) {
                         Text("Отменить", fontSize = 15.sp)
                     }
+                }
+            }
+        )
+    }
+    if (errorWindow) {
+        AlertDialog(
+            onDismissRequest = { errorWindow = false },
+            title = { Text(text = "Не коррекктные данные") },
+            text = { Text(errorText) },
+            buttons = {
+                Button(onClick = {
+                    errorWindow = false
+                }) {
+                    Text("Ок", fontSize = 15.sp)
                 }
             }
         )
@@ -1018,7 +1098,7 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                             .onGloballyPositioned { coordinates ->
                                 typeTextFieldSize = coordinates.size.toSize()
                             },
-                        label = {Text("Тип точки назначения")},
+                        label = { Text("Тип точки назначения") },
                         trailingIcon = {
                             Icon(typeIcon,"",
                                 Modifier.clickable { typeExpanded = !typeExpanded })
@@ -1041,9 +1121,64 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                         }
                     }
                 }
+                if (table == "Сотрудники") {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Пароль") }
+                    )
+                }
 
                 Button(onClick = {
-                    dialogWindow = true
+                    var err = false
+                    head.forEachIndexed { index, item ->
+                        val fieldValue = data[index]
+
+                        if (item.contains("дата", ignoreCase = true)) {
+                            try {
+                                LocalDate.parse(data[index], dateFormatter)
+                            } catch (e: DateTimeParseException) {
+                                errorText = "Неправильный формат даты в поле: ${head[index]} - ${data[index]}\nВведите дату в формате год-месяц-день"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("телефон", ignoreCase = true)) {
+                            val phoneNumber = data[index]
+                            if (!phoneNumber.matches(Regex("^89\\d{9}\$"))) {
+                                errorText = "Неправильный формат номера телефона в поле: ${head[index]} - $phoneNumber\nНомер должен содержать только цифры, быть длиной в 11 символов и начинаться с 89"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("Гос. номер", ignoreCase = true)) {
+                            val stateNumber = data[index]
+                            if (!stateNumber.matches(Regex("^[A-ZА-Я]\\d{3}[A-ZА-Я]{2}\$"))) {
+                                errorText = "Неправильный формат гос. номера в поле: ${head[index]} - $stateNumber\nНомер должен содержать одну букву, три цифры и две буквы (например, A123BC)"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("ID", ignoreCase = true)) {
+                            if (!fieldValue.matches(Regex("^\\d+\$"))) {
+                                errorText = "Неправильный формат ID в поле: ${head[index]} - $fieldValue\nID должен содержать только цифры"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+
+                        if (item.contains("Вес", ignoreCase = true) || item.contains("Объем", ignoreCase = true) || item.contains("Стоимость", ignoreCase = true)) {
+                            if (!fieldValue.matches(Regex("^\\d+\\.?\\d*\$"))) {
+                                errorText = "Неправильный формат в поле: ${head[index]} - $fieldValue\nЗначение должно быть целым числом или числом с плавающей точкой (например, 123 или 123.45)"
+                                errorWindow = true
+                                err = true
+                            }
+                        }
+                    }
+                    if(!err) dialogWindow = true
                 }) {
                     Text("Добавить")
                 }

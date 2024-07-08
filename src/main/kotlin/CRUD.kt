@@ -39,7 +39,7 @@ fun getContact(inId: Int): List<String> {
 fun updateContact(data: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val statement: PreparedStatement = connection.prepareStatement("CALL update_contact(${data[0].toInt()},::int " +
+            val statement: PreparedStatement = connection.prepareStatement("CALL update_contact(${data[0].toInt()}::int, " +
                     "'${data[1]}'::varchar, '${data[2]}'::varchar, '${data[3]}'::varchar, '${data[4]}'::text)")
             statement.executeUpdate()
         }
@@ -432,18 +432,18 @@ fun deleteJob(jobId: Int) {
 fun createEmployee(data: List<String>, inDay: List<String>, pasport: List<String>) {
     try {
         DataBasePostgres.getConnection().use { connection ->
-            val pasportData = "'{\"series\": \"${pasport[0]}\", \"number\": \"${pasport[1]}\", \"issued_by\": \"${pasport[3]}\", \"issued_date\": \"${pasport[4]}\"}'"
+            val pasportData = "'{\"series\": \"${pasport[0]}\", \"number\": \"${pasport[1]}\", \"issued_by\": \"${pasport[2]}\", \"issued_date\": \"${pasport[3]}\"}'"
             var day = "'{"
             for (i in inDay){
-                day += " '$i',"
+                day += " ''$i'',"
             }
-            day.dropLast(1)
+            day = day.dropLast(1)
             day += "}'"
 
             val statement: PreparedStatement =
                 connection.prepareStatement("CALL create_employee('${data[0]}', '${data[1]}', '${data[2]}', " +
-                        "'${data[3]}', '${data[4]}', $pasportData, " +
-                        "$day, '${data[5]}', '${data[6]}', ${data[7].toInt()})")
+                        "'${data[3]}'::date, '${data[4]}', $pasportData, " +
+                        "$day, '${data[5]}', '${data[9]}', ${data[6].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
@@ -596,7 +596,6 @@ fun getContract(inId: Int): List<String> {
                 result = listOf(
                     resultSet.getInt("ids").toString(),
                     resultSet.getString("conclusiondates"),
-                    resultSet.getFloat("costs").toString(),
                     resultSet.getInt("customer_ids").toString(),
                     resultSet.getInt("manager_ids").toString(),
                     resultSet.getInt("driver_ids").toString(),
@@ -611,10 +610,12 @@ fun getContract(inId: Int): List<String> {
 }
 fun updateContract(data: List<String>) {
     try {
+        println("CALL update_contract(${data[0].toInt()}, '${data[1]}'::date, " +
+                "${data[2].toInt()}, ${data[3].toInt()}, ${data[4].toInt()}, ${data[5].toInt()}")
         DataBasePostgres.getConnection().use { connection ->
             val statement: PreparedStatement =
-                connection.prepareStatement("CALL update_contract(${data[0].toInt()}::int, '${data[1]}'::date, " +
-                        "${data[2].toInt()}::int, ${data[3].toInt()}::int, ${data[4].toInt()}::int, ${data[5].toInt()}::int")
+                connection.prepareStatement("CALL update_contract(${data[0].toInt()}, '${data[1]}'::date, " +
+                        "${data[2].toInt()}, ${data[3].toInt()}, ${data[4].toInt()}, ${data[5].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {

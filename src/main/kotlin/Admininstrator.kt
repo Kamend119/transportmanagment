@@ -620,7 +620,7 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
                             .clickable {
                                 onLoginSuccess(
                                     "Администратор",
-                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"),
+                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"),
                                     "Клиенты",
                                     Pages.DataAdministrator,
                                     Pages.TablePage
