@@ -406,4 +406,3 @@ fun DataManager(onLogout: (Pages) -> Unit,
         }
     }
 }
-

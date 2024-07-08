@@ -11,7 +11,7 @@ fun authorization(login: String, password: String): List<String>? {
             val statement: Statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM authorization('$login', '$password')")
             if (resultSet.next()) {
-                val employeeId = resultSet.getInt("id").toString()?: ""
+                val employeeId = resultSet.getInt("id").toString()
                 val jobName = resultSet.getString("job_name")?: ""
                 result = listOf(employeeId, jobName)
                 return result
@@ -31,10 +31,10 @@ fun getActiveTrip(driverId: String): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_active_trip($driverId)")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("contracts_number").toString()?: "",
+                    resultSet.getInt("contracts_number").toString(),
                     resultSet.getString("driver_fullname")?: "",
                     resultSet.getString("client_fullname")?: "",
-                    resultSet.getDate("conclusion_date").toString()?: ""
+                    resultSet.getDate("conclusion_date").toString()
                 )
                 result.add(row)
             }
@@ -53,8 +53,8 @@ fun generateCargoDeclaration(contractId: String): List<List<String>> {
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("cargo_name")?: "",
-                    resultSet.getFloat("cargo_volume").toString()?: "",
-                    resultSet.getFloat("cargo_weight").toString()?: "",
+                    resultSet.getFloat("cargo_volume").toString(),
+                    resultSet.getFloat("cargo_weight").toString(),
                     resultSet.getString("cargo_description")?: ""
                 )
                 result.add(row)
@@ -73,9 +73,9 @@ fun getContractInfo(contractId: String): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contracts_info($contractId)")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("contracts_id").toString()?: "",
-                    resultSet.getDate("conclusion_date").toString()?: "",
-                    resultSet.getFloat("cost").toString()?: "",
+                    resultSet.getInt("contracts_id").toString(),
+                    resultSet.getDate("conclusion_date").toString(),
+                    resultSet.getFloat("cost").toString(),
                     resultSet.getString("customer_fullname")?: "",
                     resultSet.getString("manager_fullname")?: "",
                     resultSet.getString("driver_fullname")?: "",
@@ -101,10 +101,10 @@ fun viewCargosInContract(contractId: String): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM view_cargos_in_contract($contractId)")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("cargos_id").toString()?: "",
+                    resultSet.getInt("cargos_id").toString(),
                     resultSet.getString("cargos_name")?: "",
-                    resultSet.getFloat("weight").toString()?: "",
-                    resultSet.getFloat("volume").toString()?: "",
+                    resultSet.getFloat("weight").toString(),
+                    resultSet.getFloat("volume").toString(),
                     resultSet.getString("cargo_class")?: ""
                 )
                 result.add(row)
@@ -123,11 +123,11 @@ fun getContractDestinationPoints(contractId: String): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM get_contract_destination_points(${contractId.toInt()})")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("destination_point_id").toString()?: "",
+                    resultSet.getInt("destination_point_id").toString(),
                     resultSet.getString("type")?: "",
                     resultSet.getString("city")?: "",
                     resultSet.getString("address")?: "",
-                    resultSet.getDate("arrivaldate").toString()?: "",
+                    resultSet.getDate("arrivaldate").toString(),
                     resultSet.getString("status")?: ""
                 )
                 result.add(row)
@@ -158,10 +158,10 @@ fun viewActiveContractInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM view_active_contract_info()")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("contract_number").toString()?: "",
+                    resultSet.getInt("contract_number").toString(),
                     resultSet.getString("manager_fullname")?: "",
                     resultSet.getString("customer_fullname")?: "",
-                    resultSet.getDate("conclusion_date").toString()?: ""
+                    resultSet.getDate("conclusion_date").toString()
                 )
                 result.add(row)
             }
@@ -218,7 +218,7 @@ fun contractsSummaryForPeriod(startDate: String, endDate: String): List<List<Str
                 val row = listOf(
                     resultSet.getString("manager_fullname")?: "",
                     resultSet.getString("contracts_count")?: "",
-                    resultSet.getFloat("total_amount").toString()?: ""
+                    resultSet.getFloat("total_amount").toString()
                 )
                 result.add(row)
             }
@@ -237,8 +237,8 @@ fun driverPerformanceForPeriod(startDate: String, endDate: String): List<List<St
             while (resultSet.next()) {
                 val row = listOf(
                     resultSet.getString("driver_fullname")?: "",
-                    resultSet.getInt("contracts_count").toString()?: "",
-                    resultSet.getInt("hours_on_routes").toString()?: ""
+                    resultSet.getInt("contracts_count").toString(),
+                    resultSet.getInt("hours_on_routes").toString()
                 )
                 result.add(row)
             }
@@ -259,12 +259,12 @@ fun viewCargoInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cargos_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("name")?: "",
-                    resultSet.getFloat("weight").toString()?: "",
-                    resultSet.getFloat("volume").toString()?: "",
-                    resultSet.getInt("contract_id").toString()?: "",
-                    resultSet.getInt("class_cargos_id").toString()?: ""
+                    resultSet.getFloat("weight").toString(),
+                    resultSet.getFloat("volume").toString(),
+                    resultSet.getInt("contract_id").toString(),
+                    resultSet.getInt("class_cargos_id").toString()
                 )
                 result.add(row)
             }
@@ -282,7 +282,7 @@ fun viewClassCargosInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM class_cargos_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("name")?: "",
                     resultSet.getString("description")?: ""
                 )
@@ -302,9 +302,9 @@ fun viewAdditionalServicesInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM additionalservices_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("name")?: "",
-                    resultSet.getFloat("cost").toString()?: "",
+                    resultSet.getFloat("cost").toString(),
                     resultSet.getString("description")?: ""
                 )
                 result.add(row)
@@ -323,11 +323,11 @@ fun viewDestinationPointsInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM destinationpoints_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("type")?: "",
                     resultSet.getString("city")?: "",
                     resultSet.getString("address")?: "",
-                    resultSet.getDate("arrivaldate").toString()?: "",
+                    resultSet.getDate("arrivaldate").toString(),
                     resultSet.getString("status")?: "",
                     resultSet.getInt("contract_id").toString()
                 )
@@ -347,7 +347,7 @@ fun viewCustomersInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM customers_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname")?: "",
                     resultSet.getString("firstname")?: "",
                     resultSet.getString("patronymic") ?: "",
@@ -369,13 +369,13 @@ fun viewContractInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contracts_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
-                    resultSet.getDate("conclusiondate").toString()?: "",
-                    resultSet.getFloat("cost").toString()?: "",
-                    resultSet.getInt("customer_id").toString()?: "",
-                    resultSet.getInt("manager_id").toString()?: "",
-                    resultSet.getInt("driver_id").toString()?: "",
-                    resultSet.getInt("car_id").toString()?: "",
+                    resultSet.getInt("id").toString(),
+                    resultSet.getDate("conclusiondate").toString(),
+                    resultSet.getFloat("cost").toString(),
+                    resultSet.getInt("customer_id").toString(),
+                    resultSet.getInt("manager_id").toString(),
+                    resultSet.getInt("driver_id").toString(),
+                    resultSet.getInt("car_id").toString(),
                     resultSet.getString("status")?: ""
                 )
                 result.add(row)
@@ -395,7 +395,7 @@ fun viewContactsInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contacts_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname")?: "",
                     resultSet.getString("firstname")?: "",
                     resultSet.getString("patronymic") ?: "",
@@ -417,7 +417,7 @@ fun viewAutoparkInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM autoparks_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("name")?: "",
                     resultSet.getString("address")?: "",
                     resultSet.getString("contact_id")?: ""
@@ -438,11 +438,11 @@ fun viewCarInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM cars_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("licenseplate")?: "",
                     resultSet.getString("model")?: "",
                     resultSet.getString("brand")?: "",
-                    resultSet.getInt("autopark_id").toString()?: ""
+                    resultSet.getInt("autopark_id").toString()
                 )
                 result.add(row)
             }
@@ -460,7 +460,7 @@ fun viewJobsInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM jobs_view ORDER BY name ASC")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("name")?: ""
                 )
                 result.add(row)
@@ -479,14 +479,14 @@ fun viewEmployeeInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM employees_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
+                    resultSet.getInt("id").toString(),
                     resultSet.getString("lastname")?: "",
                     resultSet.getString("firstname")?: "",
                     resultSet.getString("patronymic") ?: "",
-                    resultSet.getDate("dateofbirth").toString()?: "",
+                    resultSet.getDate("dateofbirth").toString(),
                     resultSet.getString("phone")?: "",
                     resultSet.getString("login")?: "",
-                    resultSet.getLong("job_id").toString()?: "",
+                    resultSet.getLong("job_id").toString(),
                     resultSet.getString("passport_data")?: "",
                     resultSet.getString("workdays")?: "",
                 )
@@ -506,7 +506,7 @@ fun viewAuditLogInfo(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM audit_log_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("audit_id").toString()?: "",
+                    resultSet.getInt("audit_id").toString(),
                     resultSet.getString("table_name")?: "",
                     resultSet.getString("operation")?: "",
                     resultSet.getString("changed_by")?: "",
@@ -530,9 +530,9 @@ fun viewContractAdditionalService(): List<List<String>> {
             val resultSet: ResultSet = statement.executeQuery("SELECT * FROM contract_additionalservices_view")
             while (resultSet.next()) {
                 val row = listOf(
-                    resultSet.getInt("id").toString()?: "",
-                    resultSet.getInt("contractid").toString()?: "",
-                    resultSet.getInt("additionalserviceid").toString()?: ""
+                    resultSet.getInt("id").toString(),
+                    resultSet.getInt("contractid").toString(),
+                    resultSet.getInt("additionalserviceid").toString()
                 )
                 result.add(row)
             }
