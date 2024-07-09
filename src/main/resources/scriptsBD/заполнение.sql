@@ -145,3 +145,28 @@ INSERT INTO contract_additionalservices (contractid, additionalserviceid) VALUES
 (4, 7),
 (4, 8),
 (5, 9);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT * FROM calculate_preliminary_cost('москва', 'москва', 100.0, 0.1)
+
+call get_contracts_info(1)
+
+
+
+SELECT * from driver_performance_for_period('01-01-2022', '01-01-2025')
+
+
+

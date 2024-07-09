@@ -164,7 +164,7 @@ BEGIN
     IF city_from = city_to THEN
         base_cost := 1000;
     ELSE
-        base_cost := 5000;
+        base_cost := 2000;
     END IF;
     preliminary_cost := base_cost * (weight / 100) * volume;
     RETURN preliminary_cost;

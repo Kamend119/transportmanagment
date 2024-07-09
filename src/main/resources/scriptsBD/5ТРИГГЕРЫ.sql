@@ -26,8 +26,8 @@ BEGIN
         UPDATE contracts AS c
         SET cost = (
             CASE 
-                WHEN departure_city = arrival_city THEN 1000
-                ELSE 5000
+                WHEN departure_city like arrival_city THEN 1000
+                ELSE 2000
             END * (COALESCE(NEW.weight, 0) / 100) * COALESCE(NEW.volume, 0)
         )
         WHERE c.id = NEW.contract_id;
@@ -80,35 +80,60 @@ CREATE OR REPLACE FUNCTION update_contract_cost_with_services()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'DELETE' THEN
+        RAISE NOTICE 'DELETE operation: OLD.contractid = %', OLD.contractid;
+        -- Сначала вычтем стоимость удаленной услуги
         UPDATE contracts AS c
         SET cost = c.cost - (
-            SELECT SUM(ads.cost)
-            FROM additionalservices ads
-            JOIN contract_additionalservices AS cas ON ads.id = cas.additionalserviceid
-            WHERE cas.contractid = OLD.contractid
+            SELECT COALESCE(ads.cost, 0)
+            FROM additionalservices AS ads
+            WHERE ads.id = OLD.additionalserviceid
         )
         WHERE c.id = OLD.contractid;
+        RAISE NOTICE 'Updated cost after DELETE: %', (SELECT cost FROM contracts WHERE id = OLD.contractid);
+        
     ELSIF TG_OP = 'INSERT' THEN
+        RAISE NOTICE 'INSERT operation: NEW.contractid = %', NEW.contractid;
+        -- Затем добавим стоимость новой услуги
         UPDATE contracts AS c
         SET cost = c.cost + (
-            SELECT SUM(ads.cost)
-            FROM additionalservices ads
-            JOIN contract_additionalservices AS cas ON ads.id = cas.additionalserviceid
-            WHERE cas.contractid = NEW.contractid
+            SELECT COALESCE(ads.cost, 0)
+            FROM additionalservices AS ads
+            WHERE ads.id = NEW.additionalserviceid
         )
         WHERE c.id = NEW.contractid;
+        RAISE NOTICE 'Updated cost after INSERT: %', (SELECT cost FROM contracts WHERE id = NEW.contractid);
+        
+    ELSIF TG_OP = 'UPDATE' THEN
+        RAISE NOTICE 'UPDATE operation: OLD.contractid = %, NEW.contractid = %', OLD.contractid, NEW.contractid;
+        -- Сначала вычтем стоимость старой услуги
+        UPDATE contracts AS c
+        SET cost = c.cost - (
+            SELECT COALESCE(ads.cost, 0)
+            FROM additionalservices AS ads
+            WHERE ads.id = OLD.additionalserviceid
+        )
+        WHERE c.id = OLD.contractid;
+        RAISE NOTICE 'Updated cost after UPDATE (old): %', (SELECT cost FROM contracts WHERE id = OLD.contractid);
+
+        -- Затем добавим стоимость новой услуги
+        UPDATE contracts AS c
+        SET cost = c.cost + (
+            SELECT COALESCE(ads.cost, 0)
+            FROM additionalservices AS ads
+            WHERE ads.id = NEW.additionalserviceid
+        )
+        WHERE c.id = NEW.contractid;
+        RAISE NOTICE 'Updated cost after UPDATE (new): %', (SELECT cost FROM contracts WHERE id = NEW.contractid);
     END IF;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Триггер для INSERT, UPDATE, DELETE на таблицу contract_additionalservices
 CREATE TRIGGER add_service_cost_to_contract
 AFTER INSERT OR UPDATE OR DELETE ON contract_additionalservices
 FOR EACH ROW
 EXECUTE FUNCTION update_contract_cost_with_services();
-
 
 -- аудит
 -- Создание триггерной функции для аудита (для оператора)

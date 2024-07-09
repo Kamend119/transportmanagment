@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -336,7 +337,7 @@ fun DataManager(
                         fontSize = 18.sp,
                         modifier = Modifier
                             .padding(10.dp)
-                            .background(Color(239, 228, 255))
+                            .background(Color(153, 153, 255))
                             .height(100.dp)
                             .clickable {
                                 onLoginSuccess(
@@ -348,7 +349,9 @@ fun DataManager(
                                 )
                             }
                             .padding(10.dp),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

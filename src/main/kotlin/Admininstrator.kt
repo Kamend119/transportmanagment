@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -562,7 +563,7 @@ fun DataAdministrator(
                         fontSize = 18.sp,
                         modifier = Modifier
                             .padding(10.dp)
-                            .background(Color(239, 228, 255))
+                            .background(Color(153, 153, 255))
                             .height(100.dp)
                             .clickable {
                                 onLoginSuccess(
@@ -574,7 +575,9 @@ fun DataAdministrator(
                                 )
                             }
                             .padding(10.dp),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
