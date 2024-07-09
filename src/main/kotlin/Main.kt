@@ -179,7 +179,9 @@ fun TableCell(text: String, isHeader: Boolean = false) {
             .width(150.dp)
             .padding(8.dp),
         style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        color = if (isHeader) Color.White else Color.Black,
+        fontWeight = if (isHeader) FontWeight.Bold else FontWeight.Normal
     )
 }
 
@@ -377,6 +379,13 @@ fun loadImageResource(path: String): ImageBitmap {
     return loadImageBitmap(inputStream)
 }
 
+data class DataItem(
+    val title: String,
+    val headers: List<String>,
+    val table: String,
+    val number: Int
+)
+
 @Composable
 fun SelectFileDialog(
     onDialogDismiss: (String) -> Unit
@@ -407,6 +416,7 @@ fun TablePage(
     var confirmation by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
     val add = remember { loadImageResource("src/main/resources/images/add.png") }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         data = when (tables){
@@ -525,25 +535,44 @@ fun TablePage(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-                TableHeader(headers = heads)
-                LazyColumn {
-                    items(data.size) { index ->
-                        val row = data[index]
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.Transparent)
-                                .clickable {
-                                    if (tables != "Аудит"){
-                                        currentId = row[0]
-                                        dialogWindow = true
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(scrollState)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(98, 0, 238))
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        heads.forEach { item ->
+                            TableCell(text = item, isHeader = true)
+                        }
+                    }
+                    LazyColumn {
+                        items(data.size) { index ->
+                            val row = data[index]
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.Transparent)
+                                    .clickable {
+                                        if (tables != "Аудит") {
+                                            currentId = row[0]
+                                            dialogWindow = true
+                                        }
                                     }
+                                    .padding(8.dp),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
+                                row.forEach { item ->
+                                    TableCell(text = item)
                                 }
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            row.forEach { item ->
-                                TableCell(text = item)
                             }
                         }
                     }
@@ -930,14 +959,13 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        data += password
                         println(data)
                         when (table) {
                             "Контактные лица" -> createContact(data)
                             "Автопарки" -> createAutopark(data)
                             "Автомобили" -> createCar(data)
                             "Должности" -> createJob(data)
-                            "Сотрудники" -> createEmployee(data, inDay, passport)
+                            "Сотрудники" -> createEmployee(data, inDay, passport, password)
                             "Точки назначения" -> createDestinationPoint(data, typeSelectedText)
                             "Клиенты" -> createCustomer(data)
                             "Классификация грузов" -> createCargoClass(data)

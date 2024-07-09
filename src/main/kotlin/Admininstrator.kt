@@ -1,8 +1,9 @@
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -280,6 +281,7 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
+            Text("Статистика менеджеров", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -417,6 +419,7 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
+            Text("Статистика водителей", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -508,9 +511,32 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
 }
 
 @Composable
-fun DataAdministrator(onLogout: (Pages) -> Unit,
-                onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
-){
+fun DataAdministrator(
+    onLogout: (Pages) -> Unit,
+    onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
+) {
+    val dataItems = listOf(
+        DataItem("Контактные лица", listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"), "Контактные лица", 0),
+        DataItem("Автопарки", listOf("ID", "Наименование", "Адрес", "ID контактное лицо"), "Автопарки", 1),
+        DataItem("Автомобили", listOf("ID", "Гос. номер", "Модель", "Производитель", "ID автопарка"), "Автомобили", 2),
+        DataItem("Должности", listOf("ID", "Название"), "Должности", 3),
+        DataItem("Сотрудники", listOf("ID", "Фамилия", "Имя", "Отчество", "Дата рождения", "Номер телефона", "Логин", "ID Должности", "Паспортные данные", "Рабочие дни"), "Сотрудники", 4),
+        DataItem("Точки назначения", listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"), "Точки назначения", 5),
+        DataItem("Клиенты", listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"), "Клиенты", 6),
+        DataItem("Дополнительные услуги", listOf("ID", "Название", "Стоимость", "Описание"), "Дополнительные услуги", 7),
+        DataItem("Договоры", listOf("ID","Дата заключения","Стоимость","ID клиента", "ID менеджера","ID водителя","ID автомобиля", "Статус"), "Договоры", 8),
+        DataItem("Классификация грузов", listOf("ID", "Название", "Описание"), "Классификация грузов", 9),
+        DataItem("Грузы", listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"), "Грузы", 10),
+        DataItem("Договор Дополнительные услуги", listOf("ID", "ID договора", "ID дополнительной услуги"), "Договор Дополнительные услуги", 11),
+        DataItem("Аудит", listOf("ID", "Таблица", "Операция", "Кем", "Дата", "Старые данные", "Новые данные"), "Аудит", 12)
+    )
+
+    val titles = listOf(
+        "Контактные\nлица", "Автопарки", "Автомобили", "Должности",
+        "Сотрудники", "Точки\nназначения", "Клиенты", "Дополнительные\nуслуги",
+        "Договоры", "Классификация\nгрузов", "Грузы", "Договор\nДополнительные\nуслуги", "Аудит"
+    )
+
     MainScaffold(
         title = "Администратор",
         onLogout = onLogout
@@ -523,195 +549,32 @@ fun DataAdministrator(onLogout: (Pages) -> Unit,
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Text("Данные", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-            LazyColumn(
-                Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(30.dp)
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(200.dp),
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item {
-                    Text("Контактные лица", fontSize = 18.sp,
+                items(dataItems) { item ->
+                    Text(
+                        text = titles[item.number],
+                        fontSize = 18.sp,
                         modifier = Modifier
                             .padding(10.dp)
+                            .background(Color(239, 228, 255))
+                            .height(100.dp)
                             .clickable {
                                 onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"),
-                                    "Контактные лица",
+                                    item.title,
+                                    item.headers,
+                                    item.table,
                                     Pages.DataAdministrator,
                                     Pages.TablePage
                                 )
                             }
-                            .padding(10.dp)
-                    )
-                    Text("Автопарки", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Наименование", "Адрес", "ID контактное лицо"),
-                                    "Автопарки",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Автомобили", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Гос. номер", "Модель", "Производитель", "ID автопарка"),
-                                    "Автомобили",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Должности", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Название"),
-                                    "Должности",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Сотрудники", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Дата рождения",
-                                        "Номер телефона", "Логин", "ID Должности", "Паспортные данные", "Рабочие дни"),
-                                    "Сотрудники",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Точки назначения", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"),
-                                    "Точки назначения",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Клиенты", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Фамилия", "Имя", "Отчество", "Номер телефона"),
-                                    "Клиенты",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Дополнительные услуги", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Название", "Стоимость", "Описание"),
-                                    "Дополнительные услуги",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Договоры", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID","Дата заключения","Стоимость","ID клиента",
-                                        "ID менеджера","ID водителя","ID автомобиля", "Статус"),
-                                    "Договоры",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Классификация грузов", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Название", "Описание"),
-                                    "Классификация грузов",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Грузы", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"),
-                                    "Грузы",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Договор Дополнительные услуги", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "ID договора", "ID дополнительной услуги"),
-                                    "Договор Дополнительные услуги",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
-                    )
-                    Text("Аудит", fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                onLoginSuccess(
-                                    "Администратор",
-                                    listOf("ID", "Таблица", "Операция", "Кем", "Дата", "Старые данные", "Новые данные"),
-                                    "Аудит",
-                                    Pages.DataAdministrator,
-                                    Pages.TablePage
-                                )
-                            }
-                            .padding(10.dp)
+                            .padding(10.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -853,7 +716,7 @@ fun FillInfoTripAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
                             .padding(8.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        TableCell(text = header, isHeader = true)
+                        TableCell(text = header)
                         Spacer(modifier = Modifier.width(8.dp))
                         TableCell(text = value)
                     }

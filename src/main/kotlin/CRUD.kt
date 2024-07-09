@@ -429,7 +429,7 @@ fun deleteJob(jobId: Int) {
     }
 }
 
-fun createEmployee(data: List<String>, inDay: List<String>, pasport: List<String>) {
+fun createEmployee(data: List<String>, inDay: List<String>, pasport: List<String>, password: String) {
     try {
         DataBasePostgres.getConnection().use { connection ->
             val pasportData = "'{\"series\": \"${pasport[0]}\", \"number\": \"${pasport[1]}\", \"issued_by\": \"${pasport[2]}\", \"issued_date\": \"${pasport[3]}\"}'"
@@ -443,7 +443,7 @@ fun createEmployee(data: List<String>, inDay: List<String>, pasport: List<String
             val statement: PreparedStatement =
                 connection.prepareStatement("CALL create_employee('${data[0]}', '${data[1]}', '${data[2]}', " +
                         "'${data[3]}'::date, '${data[4]}', $pasportData, " +
-                        "$day, '${data[5]}', '${data[9]}', ${data[6].toInt()})")
+                        "$day, '${data[5]}', '$password', ${data[6].toInt()})")
             statement.executeUpdate()
         }
     } catch (e: SQLException) {
