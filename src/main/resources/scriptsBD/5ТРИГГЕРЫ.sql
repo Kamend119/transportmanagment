@@ -44,12 +44,6 @@ FOR EACH ROW
 EXECUTE FUNCTION calculate_transportation_cost();
 
 
-CREATE TRIGGER update_transportation_cost
-AFTER INSERT ON cargos
-FOR EACH ROW
-EXECUTE FUNCTION calculate_transportation_cost();
-
-
 -- Триггер для предотвращения добавления рейса водителю, если у него уже есть активный
 CREATE OR REPLACE FUNCTION prevent_duplicate_driver_trip()
 RETURNS TRIGGER AS $$
