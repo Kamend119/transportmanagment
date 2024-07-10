@@ -30,7 +30,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.rememberWindowState
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -146,7 +148,9 @@ fun App() {
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Грузоперевозки"
+        title = "Грузоперевозки",
+        state = rememberWindowState(width = 900.dp, height = 650.dp),
+        icon = painterResource("images/fast-delivery.png")
     ) {
         App()
     }
