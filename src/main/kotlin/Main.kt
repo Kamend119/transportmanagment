@@ -17,8 +17,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import java.io.File
-import java.io.PrintWriter
 import javax.swing.JFileChooser
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
@@ -27,14 +25,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.rememberWindowState
-import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -158,36 +153,80 @@ fun main() = application {
 }
 
 @Composable
-fun TableHeader(headers: List<String>) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        headers.forEach { header ->
-            Text(
-                text = header,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
+    var login by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    var selectUser by remember { mutableStateOf(false) }
+    var userData by remember { mutableStateOf(listOf<String>()) }
+    var userNotFound by remember { mutableStateOf(false) }
+
+    if (selectUser) {
+        LaunchedEffect(Unit) {
+            val result = authorization(login, password)
+
+            if (result != null) {
+                userData = result
+                val page = when (result[1]) {
+                    "Администратор" -> Pages.AdministratorMainPage
+                    "Водитель" -> Pages.DriverMainPage
+                    "Менеджер" -> Pages.ManagerMainPage
+                    else -> null
+                }
+                if (page != null) {
+                    onLoginSuccess(result[0], page)
+                }
+            }
+            else{
+                userNotFound = true
+            }
+            selectUser = false
         }
     }
-}
 
-@Composable
-fun TableCell(text: String, isHeader: Boolean = false) {
-    Text(
-        text = text,
+    if (userNotFound) {
+        AlertDialog(
+            onDismissRequest = { userNotFound = false },
+            title = { Text(text = "Пользователь не найден") },
+            text = { Text("Неправильный логин или пароль!") },
+            confirmButton = {
+                Button(onClick = { userNotFound = false }) {
+                    Text("OK", fontSize = 22.sp)
+                }
+            }
+        )
+    }
+
+    Column(
         Modifier
-            .width(150.dp)
-            .padding(8.dp),
-        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center,
-        color = if (isHeader) Color.White else Color.Black,
-        fontWeight = if (isHeader) FontWeight.Bold else FontWeight.Normal
-    )
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        OutlinedTextField(
+            login,
+            onValueChange = { login = it },
+            label = { Text("Логин") }
+        )
+
+        Spacer(Modifier.padding(10.dp))
+
+        OutlinedTextField(
+            password,
+            onValueChange = { password = it },
+            label = { Text("Пароль") }
+        )
+
+        Spacer(Modifier.padding(10.dp))
+
+        Button(
+            onClick = {
+                selectUser = true
+            }
+        ) {
+            Text("Войти")
+        }
+    }
 }
 
 @Composable
@@ -285,111 +324,45 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
             }
         }
     ) {
-        innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
-                content()
-            }
+            innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            content()
+        }
     }
 }
 
 @Composable
-fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
-    var login by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    var selectUser by remember { mutableStateOf(false) }
-    var userData by remember { mutableStateOf(listOf<String>()) }
-    var userNotFound by remember { mutableStateOf(false) }
-
-    if (selectUser) {
-        LaunchedEffect(Unit) {
-            val result = authorization(login, password)
-
-            if (result != null) {
-                userData = result
-                val page = when (result[1]) {
-                    "Администратор" -> Pages.AdministratorMainPage
-                    "Водитель" -> Pages.DriverMainPage
-                    "Менеджер" -> Pages.ManagerMainPage
-                    else -> null
-                }
-                if (page != null) {
-                    onLoginSuccess(result[0], page)
-                }
-            }
-            else{
-                userNotFound = true
-            }
-            selectUser = false
-        }
-    }
-
-    if (userNotFound) {
-        AlertDialog(
-            onDismissRequest = { userNotFound = false },
-            title = { Text(text = "Пользователь не найден") },
-            text = { Text("Неправильный логин или пароль!") },
-            confirmButton = {
-                Button(onClick = { userNotFound = false }) {
-                    Text("OK", fontSize = 22.sp)
-                }
-            }
-        )
-    }
-
-    Column(
-        Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+fun TableHeader(headers: List<String>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primary)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
-        OutlinedTextField(
-            login,
-            onValueChange = { login = it },
-            label = { Text("Логин") }
-        )
-
-        Spacer(Modifier.padding(10.dp))
-
-        OutlinedTextField(
-            password,
-            onValueChange = { password = it },
-            label = { Text("Пароль") }
-        )
-
-        Spacer(Modifier.padding(10.dp))
-
-        Button(
-            onClick = {
-                selectUser = true
-            }
-        ) {
-            Text("Войти")
+        headers.forEach { header ->
+            Text(
+                text = header,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }
 
-fun saveToCsv(data: List<List<String>>, filePath: String, titles: List<String>) {
-    val outputFile = File(filePath)
-    PrintWriter(outputFile).use { out ->
-        out.println(titles)
-        data.forEach { row ->
-            out.println(row.joinToString(","))
-        }
-    }
+@Composable
+fun TableCell(text: String, isHeader: Boolean = false) {
+    Text(
+        text = text,
+        Modifier
+            .width(150.dp)
+            .padding(8.dp),
+        style = if (isHeader) MaterialTheme.typography.subtitle1 else MaterialTheme.typography.body1,
+        textAlign = TextAlign.Center,
+        color = if (isHeader) Color.White else Color.Black,
+        fontWeight = if (isHeader) FontWeight.Bold else FontWeight.Normal
+    )
 }
-
-fun loadImageResource(path: String): ImageBitmap {
-    val inputStream: InputStream = File(path).inputStream()
-    return loadImageBitmap(inputStream)
-}
-
-data class DataItem(
-    val title: String,
-    val headers: List<String>,
-    val table: String,
-    val number: Int
-)
 
 @Composable
 fun SelectFileDialog(
@@ -608,40 +581,6 @@ fun TablePage(
                 }
             }
         }
-    }
-}
-
-fun fetchData(tables: String): List<List<String>> {
-    return when (tables) {
-        "Контактные лица" -> viewContactsInfo()
-        "Автопарки" -> viewAutoparkInfo()
-        "Автомобили" -> viewCarInfo()
-        "Должности" -> viewJobsInfo()
-        "Сотрудники" -> viewEmployeeInfo()
-        "Точки назначения" -> viewDestinationPointsInfo()
-        "Клиенты" -> viewCustomersInfo()
-        "Классификация грузов" -> viewClassCargosInfo()
-        "Дополнительные услуги" -> viewAdditionalServicesInfo()
-        "Договоры" -> viewContractInfo()
-        "Договор Дополнительные услуги" -> viewContractAdditionalService()
-        else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
-    }
-}
-
-fun deleteEntry(tables: String, currentId: String) {
-    when (tables) {
-        "Контактные лица" -> deleteContact(currentId.toInt())
-        "Автопарки" -> deleteAutopark(currentId.toInt())
-        "Автомобили" -> deleteCar(currentId.toInt())
-        "Должности" -> deleteJob(currentId.toInt())
-        "Сотрудники" -> deleteEmployee(currentId.toInt())
-        "Точки назначения" -> deleteDestinationPoint(currentId.toInt())
-        "Клиенты" -> deleteCustomer(currentId.toInt())
-        "Классификация грузов" -> deleteCargoClass(currentId.toInt())
-        "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
-        "Договоры" -> deleteContract(currentId.toInt())
-        "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
-        else -> if (tables == "Грузы") deleteCargo(currentId.toInt())
     }
 }
 
