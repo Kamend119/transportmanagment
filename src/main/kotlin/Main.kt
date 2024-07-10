@@ -723,7 +723,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, heads: List<String>, ta
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text("Изменить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
 
@@ -1035,7 +1035,7 @@ fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: S
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text("Добавить $table", style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
 
