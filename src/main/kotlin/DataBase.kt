@@ -3,7 +3,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 object DataBasePostgres {
-    private const val URL = "jdbc:postgresql://localhost:5432/transportmanagments"
+    private const val URL = "jdbc:postgresql://localhost:5432/transportmanagment"
     private const val Users = "postgres"
     private const val Password = "OpHypLoic"
 
