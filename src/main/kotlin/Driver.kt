@@ -165,7 +165,7 @@ fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
                             .padding(8.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        TableCell(text = header, isHeader = true)
+                        TableCell(text = header)
                         Spacer(modifier = Modifier.width(8.dp))
                         TableCell(text = value)
                     }

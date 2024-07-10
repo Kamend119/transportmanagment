@@ -38,14 +38,15 @@ fun ManagerMainPage(
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        dialogWindow = false
                         onLoginSuccess(currentId, Pages.FillInfoTripManager)
+                        println("gthdsq $currentId")
+                        dialogWindow = false
                     }) {
                         Text("Просмотреть полную информацию", fontSize = 15.sp)
                     }
                     Button(onClick = {
-                        dialogWindow = false
                         onLoginSuccess(currentId, Pages.AdditionalServicesContract)
+                        dialogWindow = false
                     }) {
                         Text("Просмотреть дополнительные услуги в договоре", fontSize = 15.sp)
                     }
@@ -80,8 +81,8 @@ fun ManagerMainPage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    dialogWindow = true
                                     currentId = trip[0]
+                                    dialogWindow = true
                                 }
                                 .background(Color.Transparent)
                                 .padding(8.dp),
@@ -194,7 +195,7 @@ fun PreliminaryCostManager(onLogout: (Pages) -> Unit) {
 @Composable
 fun FillInfoTripManager(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
-
+println(contractID)
     LaunchedEffect(Unit) {
         declaration = getContractInfo(contractID)
     }
@@ -301,16 +302,17 @@ fun DataManager(
     onLoginSuccess: (title: String, head: List<String>, table: String, currentPagess: Pages, page: Pages) -> Unit
 ) {
     val dataItems = listOf(
-        DataItem("Грузы", listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"), "Грузы", 0),
-        DataItem("Классификация грузов", listOf("ID", "Название", "Описание"), "Классификация грузов", 1),
-        DataItem("Дополнительные услуги", listOf("ID", "Название", "Стоимость", "Описание"), "Дополнительные услуги", 2),
-        DataItem("Точки назначения", listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"), "Точки назначения", 3),
-        DataItem("Клиенты", listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"), "Клиенты", 4),
-        DataItem("Договоры", listOf("ID", "Дата заключения", "Стоимость", "ID клиента", "ID менеджера", "ID водителя", "ID автомобиля", "Статус"), "Договоры", 5)
+        DataItem("Менеджер", listOf("ID", "Наименование", "Вес", "Объем", "ID договора", "ID класса груза"), "Грузы", 0),
+        DataItem("Менеджер", listOf("ID", "Название", "Описание"), "Классификация грузов", 1),
+        DataItem("Менеджер", listOf("ID", "Название", "Стоимость", "Описание"), "Дополнительные услуги", 2),
+        DataItem("Менеджер", listOf("ID", "Тип", "Город", "Адрес", "Дата прибытия", "Статус", "ID договора"), "Точки назначения", 3),
+        DataItem("Менеджер", listOf("ID", "Фамилия", "Имя", "Отчество", "Телефон"), "Клиенты", 4),
+        DataItem("Менеджер", listOf("ID", "Дата заключения", "Стоимость", "ID клиента", "ID менеджера", "ID водителя", "ID автомобиля", "Статус"), "Договоры", 5),
+        DataItem("Менеджер", listOf("ID", "ID договора", "ID дополнительной услуги"), "Договор Дополнительные услуги", 6)
     )
 
     val titles = listOf("Грузы", "Классификация\nгрузов", "Дополнительные\nуслуги", "Точки\nназначения",
-        "Клиенты", "Договоры")
+        "Клиенты", "Договоры", "Договор\nДополнительные\nуслуги")
 
     MainScaffold(
         title = "Менеджер",

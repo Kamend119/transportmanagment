@@ -67,7 +67,7 @@ fun App() {
             }, { currentPage = it }, userID)
             Pages.ManagerMainPage -> ManagerMainPage ({ userId, page ->
                 currentPage = page
-                userID = userId }, { currentPage = it }
+                currentId = userId }, { currentPage = it }
             )
 
             // водитэл
