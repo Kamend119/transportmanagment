@@ -692,6 +692,20 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, heads: List<String>, ta
             }
         )
     }
+    if (errorWindow) {
+        AlertDialog(
+            onDismissRequest = { errorWindow = false },
+            title = { Text(text = "Не коррекктные данные") },
+            text = { Text(errorText) },
+            buttons = {
+                Button(onClick = {
+                    errorWindow = false
+                }) {
+                    Text("Ок", fontSize = 15.sp)
+                }
+            }
+        )
+    }
 
     MainScaffold(
         title = title,
