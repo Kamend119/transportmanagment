@@ -152,6 +152,7 @@ fun main() = application {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     var login by remember { mutableStateOf("") }
@@ -229,6 +230,7 @@ fun LoginPage(onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
@@ -331,6 +333,7 @@ fun MainScaffold(title: String, onLogout: (Pages) -> Unit, content: @Composable 
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TableHeader(headers: List<String>) {
     Row(
@@ -350,6 +353,7 @@ fun TableHeader(headers: List<String>) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TableCell(text: String, isHeader: Boolean = false) {
     Text(
@@ -364,6 +368,7 @@ fun TableCell(text: String, isHeader: Boolean = false) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SelectFileDialog(
     onDialogDismiss: (String) -> Unit
@@ -384,6 +389,7 @@ fun SelectFileDialog(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TablePage(
     onLogout: (Pages) -> Unit, titles: String, heads: List<String>, tables: String,
@@ -584,6 +590,7 @@ fun TablePage(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun UpdatePage(onLogout: (Pages) -> Unit, title: String, heads: List<String>, table: String, currentId: String, currentPagess: Pages){
     var data by remember { mutableStateOf(listOf("")) }
@@ -931,6 +938,7 @@ fun UpdatePage(onLogout: (Pages) -> Unit, title: String, heads: List<String>, ta
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun AddPage(onLogout: (Pages) -> Unit,title: String,heads: List<String>,table: String) {
     var data by remember { mutableStateOf(listOf<String>()) }

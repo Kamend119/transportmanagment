@@ -1,8 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm")
-    id("org.jetbrains.compose")
+    kotlin("jvm") version "1.8.20" // Используйте последнюю совместимую версию Kotlin
+    kotlin("plugin.serialization") version "1.8.20" // Если используется
+    id("org.jetbrains.compose") version "1.4.0" // Используйте последнюю версию плагина Compose
 }
 
 group = "com.example"
@@ -12,10 +13,11 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
+    maven(url = "https://repo.spring.io/milestone")
 }
 
 dependencies {
-    implementation("org.postgresql:postgresql:42.3.3")
+    implementation("org.postgresql:postgresql:42.7.2")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
@@ -29,8 +31,12 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "demo"
+            packageName = "transportmanagment"
             packageVersion = "1.0.0"
+
+            windows {
+                iconFile.set(project.file("src/main/resources/images/add.png"))
+            }
         }
     }
 }

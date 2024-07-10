@@ -1,3 +1,4 @@
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ManagerMainPage(
     onLoginSuccess: (userData: String, page: Pages) -> Unit,
@@ -99,6 +101,7 @@ fun ManagerMainPage(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PreliminaryCostManager(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(0.0) }
@@ -192,6 +195,7 @@ fun PreliminaryCostManager(onLogout: (Pages) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun FillInfoTripManager(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -248,6 +252,7 @@ println(contractID)
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
     var data by remember { mutableStateOf(listOf(listOf(""))) }
@@ -296,6 +301,7 @@ fun AdditionalServicesContract(onLogout: (Pages) -> Unit, contractID: String){
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DataManager(
     onLogout: (Pages) -> Unit,

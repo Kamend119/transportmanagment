@@ -1,3 +1,4 @@
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DriverMainPage(
     onLoginSuccess: (userData: String, page: Pages, driverID: String) -> Unit,
@@ -119,6 +121,7 @@ fun DriverMainPage(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -175,6 +178,7 @@ fun FillInfoTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -223,6 +227,7 @@ fun CargosWithTripDriver(onLogout: (Pages) -> Unit, contractID: String) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String, onLoginSuccess: (page: Pages, id: String) -> Unit) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -272,6 +277,7 @@ fun DepartPointsDriver(onLogout: (Pages) -> Unit, contractID: String, onLoginSuc
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -360,6 +366,7 @@ fun DeclarationDriver(onLogout: (Pages) -> Unit, contractID: String) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun UpdateStatus(onLogout: (Pages) -> Unit, id: String){
     var mExpanded by remember { mutableStateOf(false) }

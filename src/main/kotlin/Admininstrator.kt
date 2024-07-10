@@ -21,6 +21,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: String, page: Pages) -> Unit) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
@@ -101,6 +102,7 @@ fun AdministratorMainPage(onLogout: (Pages) -> Unit, onLoginSuccess: (userData: 
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(0.0) }
@@ -199,6 +201,7 @@ fun PreliminaryCostAdmin(onLogout: (Pages) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ReportsAdministrator(onLogout: (Pages) -> Unit){
     MainScaffold(
@@ -235,6 +238,7 @@ fun ReportsAdministrator(onLogout: (Pages) -> Unit){
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
@@ -373,6 +377,7 @@ fun ContractsSummaryForManagers(onLogout: (Pages) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DriverPerformance(onLogout: (Pages) -> Unit) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
@@ -511,6 +516,7 @@ fun DriverPerformance(onLogout: (Pages) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DataAdministrator(
     onLogout: (Pages) -> Unit,
@@ -585,6 +591,7 @@ fun DataAdministrator(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
@@ -673,6 +680,7 @@ fun DeclarationAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun FillInfoTripAdministrator(onLogout: (Pages) -> Unit, contractID: String) {
     var declaration by remember { mutableStateOf(listOf(listOf(""))) }
