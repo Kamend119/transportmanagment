@@ -1,35 +1,49 @@
--- Триггер для расчета стоимости грузоперевозки
 CREATE OR REPLACE FUNCTION calculate_transportation_cost()
 RETURNS TRIGGER AS $$
 DECLARE
     departure_city TEXT;
     arrival_city TEXT;
+    old_cost NUMERIC(10, 2);
+    new_cost NUMERIC(10, 2);
 BEGIN
     -- Получение города отправления для контракта
     SELECT city 
     INTO departure_city
     FROM destinationpoints dp
-    JOIN contracts c ON c.id = dp.contract_id
-    WHERE c.id = NEW.contract_id AND dp.type = 'Отправление'
+    WHERE dp.contract_id = NEW.contract_id AND dp.type = 'Отправление'
     LIMIT 1;
 
     -- Получение города прибытия для контракта
     SELECT city 
     INTO arrival_city
     FROM destinationpoints dp
-    JOIN contracts c ON c.id = dp.contract_id
-    WHERE c.id = NEW.contract_id AND dp.type = 'Прибытие'
+    WHERE dp.contract_id = NEW.contract_id AND dp.type = 'Прибытие'
     LIMIT 1;
+
+    -- Рассчитываем новую стоимость
+    new_cost := (
+        CASE 
+            WHEN departure_city = arrival_city THEN 10
+            ELSE 20
+        END * (COALESCE(NEW.weight, 0) / 100) * COALESCE(NEW.volume, 0)
+    );
+
+    -- Получаем старую стоимость груза
+    IF TG_OP = 'UPDATE' THEN
+        SELECT (
+            CASE 
+                WHEN departure_city = arrival_city THEN 10
+                ELSE 20
+            END * (COALESCE(OLD.weight, 0) / 100) * COALESCE(OLD.volume, 0)
+        ) INTO old_cost;
+    ELSE
+        old_cost := 0.00;
+    END IF;
 
     -- Если города отправления и прибытия найдены, то обновляем стоимость
     IF departure_city IS NOT NULL AND arrival_city IS NOT NULL THEN
         UPDATE contracts AS c
-        SET cost = (
-            CASE 
-                WHEN departure_city like arrival_city THEN 1000
-                ELSE 2000
-            END * (COALESCE(NEW.weight, 0) / 100) * COALESCE(NEW.volume, 0)
-        )
+        SET cost = (cost - old_cost + new_cost)
         WHERE c.id = NEW.contract_id;
     END IF;
 

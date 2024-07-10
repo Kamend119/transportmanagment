@@ -30,12 +30,19 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
             packageName = "transportmanagment"
             packageVersion = "1.0.0"
 
+
             windows {
-                iconFile.set(project.file("src/main/resources/images/add.png"))
+                iconFile.set(project.file("src/main/resources/images/delivery-truck512-512.png"))
+            }
+            linux {
+                iconFile.set(project.file("src/main/resources/images/delivery-truck512-512.png"))
+            }
+            macOS {
+                iconFile.set(project.file("src/main/resources/images/delivery-truck512-512.png"))
             }
         }
     }

@@ -162,9 +162,9 @@ DECLARE
     preliminary_cost NUMERIC;
 BEGIN
     IF city_from = city_to THEN
-        base_cost := 1000;
+        base_cost := 10;
     ELSE
-        base_cost := 2000;
+        base_cost := 20;
     END IF;
     preliminary_cost := base_cost * (weight / 100) * volume;
     RETURN preliminary_cost;
