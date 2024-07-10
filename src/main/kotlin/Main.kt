@@ -21,7 +21,9 @@ import java.io.File
 import java.io.PrintWriter
 import javax.swing.JFileChooser
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.format.TextStyle
 
 @Composable
 @Preview
@@ -149,7 +152,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Грузоперевозки",
-        state = rememberWindowState(width = 900.dp, height = 650.dp),
+        state = rememberWindowState(width = 950.dp, height = 650.dp),
         icon = painterResource("images/fast-delivery.png")
     ) {
         App()
@@ -414,28 +417,32 @@ fun SelectFileDialog(
 fun TablePage(
     onLogout: (Pages) -> Unit, titles: String, heads: List<String>, tables: String,
     onLoginSuccess: (title: String, head: List<String>, table: String, currentId: String, currentPagess: Pages, page: Pages) -> Unit
-){
+) {
     var data by remember { mutableStateOf(listOf(listOf(""))) }
+    var filteredData by remember { mutableStateOf(listOf(listOf(""))) }
     var dialogWindow by remember { mutableStateOf(false) }
     var confirmation by remember { mutableStateOf(false) }
     var currentId by remember { mutableStateOf("") }
     val add = remember { loadImageResource("src/main/resources/images/add.png") }
     val scrollState = rememberScrollState()
 
+    var searchColumn by remember { mutableStateOf(heads.first()) }
+    var searchText by remember { mutableStateOf("") }
+    var columnExpanded by remember { mutableStateOf(false) }
+    var columnTextFieldSize by remember { mutableStateOf(Size.Zero) }
+
     LaunchedEffect(Unit) {
-        data = when (tables){
-            "Контактные лица" -> viewContactsInfo()
-            "Автопарки" -> viewAutoparkInfo()
-            "Автомобили" -> viewCarInfo()
-            "Должности" -> viewJobsInfo()
-            "Сотрудники" -> viewEmployeeInfo()
-            "Точки назначения" -> viewDestinationPointsInfo()
-            "Клиенты" -> viewCustomersInfo()
-            "Классификация грузов" -> viewClassCargosInfo()
-            "Дополнительные услуги" -> viewAdditionalServicesInfo()
-            "Договоры" -> viewContractInfo()
-            "Договор Дополнительные услуги" -> viewContractAdditionalService()
-            else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
+        data = fetchData(tables)
+        filteredData = data
+    }
+
+    LaunchedEffect(searchText, searchColumn) {
+        filteredData = if (searchText.isEmpty()) {
+            data
+        } else {
+            data.filter { row ->
+                row[heads.indexOf(searchColumn)].contains(searchText, ignoreCase = true)
+            }
         }
     }
 
@@ -474,34 +481,9 @@ fun TablePage(
                     Modifier.padding(25.dp)
                 ) {
                     Button(onClick = {
-                        when (tables){
-                            "Контактные лица" -> deleteContact(currentId.toInt())
-                            "Автопарки" -> deleteAutopark(currentId.toInt())
-                            "Автомобили" -> deleteCar(currentId.toInt())
-                            "Должности" -> deleteJob(currentId.toInt())
-                            "Сотрудники" -> deleteEmployee(currentId.toInt())
-                            "Точки назначения" -> deleteDestinationPoint(currentId.toInt())
-                            "Клиенты" -> deleteCustomer(currentId.toInt())
-                            "Классификация грузов" -> deleteCargoClass(currentId.toInt())
-                            "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
-                            "Договоры" -> deleteContract(currentId.toInt())
-                            "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
-                            else -> if (tables == "Грузы") deleteCargo(currentId.toInt())
-                        }
-                        data = when (tables){
-                            "Контактные лица" -> viewContactsInfo()
-                            "Автопарки" -> viewAutoparkInfo()
-                            "Автомобили" -> viewCarInfo()
-                            "Должности" -> viewJobsInfo()
-                            "Сотрудники" -> viewEmployeeInfo()
-                            "Точки назначения" -> viewDestinationPointsInfo()
-                            "Клиенты" -> viewCustomersInfo()
-                            "Классификация грузов" -> viewClassCargosInfo()
-                            "Дополнительные услуги" -> viewAdditionalServicesInfo()
-                            "Договоры" -> viewContractInfo()
-                            "Договор Дополнительные услуги" -> viewContractAdditionalService()
-                            else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
-                        }
+                        deleteEntry(tables, currentId)
+                        data = fetchData(tables)
+                        filteredData = data
                         confirmation = false
                     }) {
                         Text("Ок", fontSize = 15.sp)
@@ -526,11 +508,12 @@ fun TablePage(
                     FloatingActionButton(onClick = {
                         onLoginSuccess(titles, heads, tables, "", Pages.TablePage, Pages.AddPage)
                     },
-                    backgroundColor = Color(98, 0, 238)) {
+                        backgroundColor = Color(98, 0, 238)) {
                         Image(bitmap = add, contentDescription = "Добавить", Modifier.size(30.dp))
                     }
                 }
-        }){
+            }
+        ){
             Column(
                 Modifier
                     .fillMaxSize()
@@ -539,6 +522,50 @@ fun TablePage(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Text(tables, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = searchColumn,
+                        onValueChange = { searchColumn = it },
+                        label = { Text("Колонка") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .onGloballyPositioned { coordinates ->
+                                columnTextFieldSize = coordinates.size.toSize()
+                            },
+                        trailingIcon = {
+                            Icon(Icons.Default.ArrowDropDown, "",
+                                Modifier.clickable { columnExpanded = !columnExpanded })
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    OutlinedTextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        label = { Text("Поиск") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    DropdownMenu(
+                        expanded = columnExpanded,
+                        onDismissRequest = { columnExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current){columnTextFieldSize.width.toDp()})
+                    ) {
+                        heads.forEach { label ->
+                            DropdownMenuItem(onClick = {
+                                searchColumn = label
+                                columnExpanded = false
+                            }) {
+                                Text(text = label)
+                            }
+                        }
+                    }
+                }
+
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -546,7 +573,7 @@ fun TablePage(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(20.dp)
-                ){
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -559,8 +586,8 @@ fun TablePage(
                         }
                     }
                     LazyColumn {
-                        items(data.size) { index ->
-                            val row = data[index]
+                        items(filteredData.size) { index ->
+                            val row = filteredData[index]
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -583,7 +610,40 @@ fun TablePage(
                 }
             }
         }
+    }
+}
 
+fun fetchData(tables: String): List<List<String>> {
+    return when (tables) {
+        "Контактные лица" -> viewContactsInfo()
+        "Автопарки" -> viewAutoparkInfo()
+        "Автомобили" -> viewCarInfo()
+        "Должности" -> viewJobsInfo()
+        "Сотрудники" -> viewEmployeeInfo()
+        "Точки назначения" -> viewDestinationPointsInfo()
+        "Клиенты" -> viewCustomersInfo()
+        "Классификация грузов" -> viewClassCargosInfo()
+        "Дополнительные услуги" -> viewAdditionalServicesInfo()
+        "Договоры" -> viewContractInfo()
+        "Договор Дополнительные услуги" -> viewContractAdditionalService()
+        else -> if (tables == "Грузы") viewCargoInfo() else viewAuditLogInfo()
+    }
+}
+
+fun deleteEntry(tables: String, currentId: String) {
+    when (tables) {
+        "Контактные лица" -> deleteContact(currentId.toInt())
+        "Автопарки" -> deleteAutopark(currentId.toInt())
+        "Автомобили" -> deleteCar(currentId.toInt())
+        "Должности" -> deleteJob(currentId.toInt())
+        "Сотрудники" -> deleteEmployee(currentId.toInt())
+        "Точки назначения" -> deleteDestinationPoint(currentId.toInt())
+        "Клиенты" -> deleteCustomer(currentId.toInt())
+        "Классификация грузов" -> deleteCargoClass(currentId.toInt())
+        "Дополнительные услуги" -> deleteAdditionalService(currentId.toInt())
+        "Договоры" -> deleteContract(currentId.toInt())
+        "Договор Дополнительные услуги" -> deleteContractAdditionalService(currentId.toInt())
+        else -> if (tables == "Грузы") deleteCargo(currentId.toInt())
     }
 }
 
